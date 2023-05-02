@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atomlite"
+maintainers = [
+  { name = "Lukas Turcani", email = "lukasturcani93@gmail.com" },
+]
+
+dependencies = []
+requires-python = ">=3.11"
+version = "0.0.1"
+
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "ruff",
+  "mypy",
+  "numpy",
+  "pytest",
+  "sphinx",
+  "twine",
+]
+
+[project.urls]
+github = "https://github.com/lukasturcani/atomlite"
+documentation = "https://atomlite.readthedocs.io"
+
+[tool.setuptools.package-data]
+atomlite = [
+  "py.typed",
+]
+
+[tool.black]
+line-length = 79
+
+[tool.mypy]
+show_error_codes = true
+implicit_optional = false
+warn_no_return = true
+strict_optional = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = [
+  "rdkit.*"
+]
+ignore_missing_imports = true
