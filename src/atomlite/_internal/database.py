@@ -2,22 +2,7 @@ import pathlib
 import sqlite3
 import typing
 
-import rdkit.Chem as rdkit
-
-
-class Entry(dict):
-    def __init__(self, key: str, molecule: rdkit.Mol) -> None:
-        super().__init__()
-        self["key"] = key
-        self["molecule"] = molecule
-
-    @property
-    def key(self) -> str:
-        return self["key"]
-
-    @property
-    def molecule(self) -> rdkit.Mol:
-        return self["molecule"]
+from atomlite._internal.json import Entry, Molecule
 
 
 class Database:
@@ -30,13 +15,9 @@ class Database:
     ) -> None:
         self._molecule_table = molecule_table
         self.connection = sqlite3.connect(database)
-        self.connection.enable_load_extension(True)
-        self.connection.load_extension("chemicalite")
-        self.connection.enable_load_extension(False)
-
         self.connection.execute(
             f"CREATE TABLE IF NOT EXISTS {molecule_table}("
-            "key TEXT PRIMARY KEY, molecule MOL)",
+            "key TEXT PRIMARY KEY, molecule JSON)",
         )
 
     def add_molecules(self, molecules: Entry | typing.Iterable[Entry]) -> None:
@@ -50,6 +31,13 @@ class Database:
 
     def get_molecules(
         self, keys: str | typing.Iterable[str]
-    ) -> typing.Iterator[Entry]:
+    ) -> typing.Iterator[Molecule]:
         if isinstance(keys, str):
             keys = (keys,)
+
+        keys = tuple(keys)
+        query = ",".join("?" * len(keys))
+        yield from self.connection.execute(
+            f"SELECT molecule FROM {self._molecule_table} WHERE key IN ({query})",
+            keys,
+        )
