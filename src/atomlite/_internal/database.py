@@ -1,3 +1,4 @@
+import json
 import pathlib
 import sqlite3
 import typing
@@ -30,14 +31,18 @@ class Database:
         )
 
     def get_molecules(
-        self, keys: str | typing.Iterable[str]
-    ) -> typing.Iterator[Molecule]:
+        self,
+        keys: str | typing.Iterable[str],
+    ) -> typing.Iterator[tuple[str, Molecule]]:
         if isinstance(keys, str):
             keys = (keys,)
 
         keys = tuple(keys)
         query = ",".join("?" * len(keys))
-        yield from self.connection.execute(
-            f"SELECT molecule FROM {self._molecule_table} WHERE key IN ({query})",
-            keys,
+        yield from (
+            (key, json.loads(molecule_json_string))
+            for (key, molecule_json_string) in self.connection.execute(
+                f"SELECT * FROM {self._molecule_table} WHERE key IN ({query})",
+                keys,
+            )
         )

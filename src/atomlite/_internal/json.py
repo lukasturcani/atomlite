@@ -6,18 +6,18 @@ import rdkit.Chem as rdkit
 Json: typing.TypeAlias = float | str | None | list["Json"] | dict[str, "Json"]
 
 
-class Atom(typing.NamedTuple):
+class Atom(typing.TypedDict):
     atomic_number: int
     charge: int
 
 
-class Bond(typing.NamedTuple):
+class Bond(typing.TypedDict):
     atom1: int
     atom2: int
     order: float
 
 
-class AromaticBond(typing.NamedTuple):
+class AromaticBond(typing.TypedDict):
     atom1: int
     atom2: int
 
@@ -59,9 +59,9 @@ def from_rdkit(
     molecule: rdkit.Mol,
     properties: dict[str, Json] | None,
 ) -> Molecule:
-    bonds = []
-    dative_bonds = []
-    aromatic_bonds = []
+    bonds: list[Bond] = []
+    dative_bonds: list[Bond] = []
+    aromatic_bonds: list[AromaticBond] = []
     for bond in molecule.GetBonds():
         match bond.GetBondType():
             case (
@@ -94,14 +94,20 @@ def from_rdkit(
                 )
             case rdkit.BondType.AROMATIC:
                 aromatic_bonds.append(
-                    AromaticBond(bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
+                    {
+                        "atom1": bond.GetBeginAtomIdx(),
+                        "atom2": bond.GetEndAtomIdx(),
+                    }
                 )
             case _:
                 raise RuntimeError("Unsupported bond type")
 
     d: Molecule = {
         "atoms": [
-            Atom(atom.GetAtomicNum(), atom.GetFormalCharge())
+            {
+                "atomic_number": atom.GetAtomicNum(),
+                "charge": atom.GetFormalCharge(),
+            }
             for atom in molecule.GetAtoms()
         ],
     }
@@ -124,26 +130,26 @@ def from_rdkit(
 def to_rdkit(molecule: Molecule) -> rdkit.Mol:
     mol = rdkit.EditableMol(rdkit.Mol())
     for atom in molecule["atoms"]:
-        rdkit_atom = rdkit.Atom(atom.atomic_number)
-        rdkit_atom.SetFormalCharge(atom.charge)
+        rdkit_atom = rdkit.Atom(atom["atomic_number"])
+        rdkit_atom.SetFormalCharge(atom["charge"])
         mol.AddAtom(rdkit_atom)
 
     for bond in molecule.get("bonds", []):
         mol.AddBond(
-            beginAtomIdx=bond.atom1,
-            endAtomIdx=bond.atom2,
-            order=bond.order,
+            beginAtomIdx=bond["atom1"],
+            endAtomIdx=bond["atom2"],
+            order=rdkit.BondType(bond["order"]),
         )
     for bond in molecule.get("dative_bonds", []):
         mol.AddBond(
-            beginAtomIdx=bond.atom1,
-            endAtomIdx=bond.atom2,
+            beginAtomIdx=bond["atom1"],
+            endAtomIdx=bond["atom2"],
             order=rdkit.BondType.DATIVE,
         )
     for aromatic_bond in molecule.get("aromatic_bonds", []):
         mol.AddBond(
-            beginAtomIdx=aromatic_bond.atom1,
-            endAtomIdx=aromatic_bond.atom2,
+            beginAtomIdx=aromatic_bond["atom1"],
+            endAtomIdx=aromatic_bond["atom2"],
             order=rdkit.BondType.AROMATIC,
         )
 
