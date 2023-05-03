@@ -88,7 +88,7 @@ def _assert_properties_match(expected: dict, actual: dict) -> None:
 
 
 def _embed_molecule(molecule: rdkit.Mol) -> rdkit.Mol:
-    rdkit.EmbedMolecule(molecule)
+    rdkit.EmbedMolecule(molecule, rdkit.ETKDGv3())
     return molecule
 
 
