@@ -60,6 +60,7 @@ def test_database_stores_molecular_data_multiple_entries(
         _assert_conformers_match(molecule, actual)
         _assert_atom_numbers_match(molecule, actual)
         _assert_properties_match(entry.molecule["properties"], props)
+        assert rdkit.MolToSmiles(molecule) == rdkit.MolToSmiles(actual)
 
 
 def _assert_conformers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
@@ -79,6 +80,7 @@ def _assert_atom_numbers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
     for atom1, atom2 in zip(
         expected.GetAtoms(), actual.GetAtoms(), strict=True
     ):
+        assert atom1.GetTotalNumHs() == atom2.GetTotalNumHs()
         assert atom1.GetNumExplicitHs() == atom2.GetNumExplicitHs()
         assert atom1.GetNumImplicitHs() == atom2.GetNumImplicitHs()
 
@@ -96,6 +98,10 @@ def _embed_molecule(molecule: rdkit.Mol) -> rdkit.Mol:
     params=(
         {
             "molecule": rdkit.MolFromSmiles("CCC"),
+            "properties": {"a": {"b": [1, 2, 3]}},
+        },
+        {
+            "molecule": _embed_molecule(rdkit.MolFromSmiles("CCC")),
             "properties": {"a": {"b": [1, 2, 3]}},
         },
         {

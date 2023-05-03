@@ -160,6 +160,5 @@ def to_rdkit(molecule: Molecule) -> rdkit.Mol:
             rdkit_conf = rdkit.Conformer(num_atoms)
             for atom_id, atom_coord in enumerate(conformer):
                 rdkit_conf.SetAtomPosition(atom_id, atom_coord)
-                mol.GetAtomWithIdx(atom_id).SetNoImplicit(True)
             mol.AddConformer(rdkit_conf)
     return mol
