@@ -6,22 +6,33 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'atomlite'
-copyright = '2023, Lukas Turcani'
-author = 'Lukas Turcani'
+project = "atomlite"
+copyright = "2023, Lukas Turcani"
+author = "Lukas Turcani"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = [
+    "sphinx.ext.doctest",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+]
 
-templates_path = ['_templates']
-exclude_patterns = []
+autosummary_imported_members = True
 
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+}
+
+templates_path = ["_templates"]
+exclude_patterns: list[str] = []
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
-html_static_path = ['_static']
+html_theme = "furo"
+html_static_path = ["_static"]
