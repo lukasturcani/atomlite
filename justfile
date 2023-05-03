@@ -28,7 +28,7 @@ check:
   ( set -x; mypy . )
 
   echo
-  ( set -x; pytest )
+  ( set -x; pytest --cov=src )
 
   test $error = 0
 
