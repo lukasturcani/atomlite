@@ -38,6 +38,10 @@ atomlite = [
   "py.typed",
 ]
 
+[tool.ruff]
+line-length = 79
+extend-select = ["I"]
+
 [tool.black]
 line-length = 79
 
