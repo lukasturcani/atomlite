@@ -117,7 +117,7 @@ def from_rdkit(
         d["dative_bonds"] = dative_bonds
     if aromatic_bonds:
         d["aromatic_bonds"] = aromatic_bonds
-    if properties is not None:
+    if properties is not None and properties:
         d["properties"] = properties
     if molecule.GetNumConformers() > 0:
         d["conformers"] = [
