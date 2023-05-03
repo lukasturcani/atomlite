@@ -13,6 +13,14 @@ Welcome to atomlite's documentation!
   Modules <modules>
 
 
+GitHub: https://github.com/lukasturcani/atomlite
+
+:mod:`atomlite` is an Python library for simple molecular databases.
+
+
+Installation
+------------
+
 
 
 Indices and tables
