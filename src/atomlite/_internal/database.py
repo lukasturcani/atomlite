@@ -41,7 +41,7 @@ class Database:
         query = ",".join("?" * len(keys))
         yield from (
             (key, json.loads(molecule_json_string))
-            for (key, molecule_json_string) in self.connection.execute(
+            for key, molecule_json_string in self.connection.execute(
                 f"SELECT * FROM {self._molecule_table} WHERE key IN ({query})",
                 keys,
             )
