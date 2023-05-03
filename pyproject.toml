@@ -26,6 +26,7 @@ dev = [
   "sphinx",
   "build",
   "twine",
+  "furo",
 ]
 
 [project.urls]
