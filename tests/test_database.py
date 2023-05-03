@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import atomlite
 import numpy as np
 import pytest
-import rdkit.Chem as rdkit
+import rdkit.Chem.AllChem as rdkit
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,15 +72,15 @@ def _assert_conformers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
 
 
 def _assert_atom_numbers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
-    assert expected.GetNumAtoms() == actual.GetNumAtoms()
-    assert expected.GetNumHeavyAtoms() == actual.GetNumHeavyAtoms()
     expected.UpdatePropertyCache()
     actual.UpdatePropertyCache()
+    assert expected.GetNumAtoms() == actual.GetNumAtoms()
+    assert expected.GetNumHeavyAtoms() == actual.GetNumHeavyAtoms()
     for atom1, atom2 in zip(
         expected.GetAtoms(), actual.GetAtoms(), strict=True
     ):
-        assert atom1.GetNumImplicitHs() == atom2.GetNumImplicitHs()
         assert atom1.GetNumExplicitHs() == atom2.GetNumExplicitHs()
+        assert atom1.GetNumImplicitHs() == atom2.GetNumImplicitHs()
 
 
 def _assert_properties_match(expected: dict, actual: dict) -> None:
@@ -89,54 +89,58 @@ def _assert_properties_match(expected: dict, actual: dict) -> None:
 
 @pytest.fixture(
     params=(
-        (
-            rdkit.MolFromSmiles("CCC"),
-            {"a": {"b": [1, 2, 3]}},
-        ),
+        {
+            "molecule": rdkit.MolFromSmiles("CCC"),
+            "properties": {"a": {"b": [1, 2, 3]}},
+        },
     ),
 )
 def single_entry_case(request: pytest.FixtureRequest) -> SingleEntryCase:
-    molecule, properties = request.param
+    param = request.param
     return SingleEntryCase(
-        entry=atomlite.Entry.from_rdkit("1", molecule, properties),
-        molecule=molecule,
+        entry=atomlite.Entry.from_rdkit(
+            key="1",
+            molecule=param["molecule"],
+            properties=param["properties"],
+        ),
+        molecule=param["molecule"],
     )
 
 
 @pytest.fixture(
     params=(
-        (
-            (rdkit.MolFromSmiles("CCC"),),
-            ({"a": {"b": [1, 2, 3]}},),
-        ),
-        (
-            (
+        {
+            "molecules": (rdkit.MolFromSmiles("CCC"),),
+            "properties": ({"a": {"b": [1, 2, 3]}},),
+        },
+        {
+            "molecules": (
                 rdkit.MolFromSmiles("CCC"),
                 rdkit.MolFromSmiles("CNC"),
                 rdkit.AddHs(rdkit.MolFromSmiles("CNC")),
             ),
-            (
+            "properties": (
                 {"a": {"b": [1, 2, 3]}},
                 {"b": 231},
                 {"c": 32231},
             ),
-        ),
+        },
     ),
 )
 def multiple_entry_case(request: pytest.FixtureRequest) -> MultipleEntryCase:
-    molecules, properties = request.param
+    param = request.param
     return MultipleEntryCase(
         entries=tuple(
             atomlite.Entry.from_rdkit(str(key), molecule, props)
             for key, (molecule, props) in enumerate(
                 zip(
-                    molecules,
-                    properties,
+                    param["molecules"],
+                    param["properties"],
                     strict=True,
                 )
             )
         ),
-        molecules=molecules,
+        molecules=param["molecules"],
     )
 
 
