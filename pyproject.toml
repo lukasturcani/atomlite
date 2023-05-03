@@ -27,6 +27,7 @@ dev = [
   "build",
   "twine",
   "furo",
+  "pip-tools",
 ]
 
 [project.urls]

@@ -36,3 +36,8 @@ check:
 fix:
   black .
   ruff --fix .
+
+# Build the docker testing environment.
+build-testing-environment:
+  pip-compile -o docker_testing_environment/requirements.txt --extra dev pyproject.toml
+  docker buildx build -t atomlite-testing-environment:latest ./docker_testing_environment

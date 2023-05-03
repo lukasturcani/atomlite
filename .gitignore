@@ -5,3 +5,4 @@ __pycache__
 /build
 docs/build
 docs/source/_autosummary
+docker_testing_environment/requirements.txt
