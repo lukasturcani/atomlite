@@ -95,8 +95,7 @@ And finally you can retrieve the molecules with their keys:
 
   for key, molecule in db.get_molecules(["first", "second"]):
       rdkit_molecule = atomlite.to_rdkit(molecule)
-
-
+      print(molecule["properties"])
 
 
 Indices and tables
