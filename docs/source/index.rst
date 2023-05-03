@@ -47,7 +47,7 @@ Installation
 Getting help
 ------------
 
-If you get stuck using :mod:`atomlite` we I encourage you to get in
+If you get stuck using :mod:`atomlite` I encourage you to get in
 touch on Discord (`invite link`_) or by creating an `issue`_ on GitHub.
 I'm happy to help!
 
