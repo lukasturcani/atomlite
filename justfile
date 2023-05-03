@@ -28,7 +28,7 @@ check:
   ( set -x; mypy . )
 
   echo
-  ( set -x; pytest --cov=src )
+  ( set -x; pytest --cov=src --cov-report term-missing )
 
   test $error = 0
 
