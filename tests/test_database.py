@@ -113,10 +113,12 @@ def single_entry_case(request: pytest.FixtureRequest) -> SingleEntryCase:
             (
                 rdkit.MolFromSmiles("CCC"),
                 rdkit.MolFromSmiles("CNC"),
+                rdkit.AddHs(rdkit.MolFromSmiles("CNC")),
             ),
             (
                 {"a": {"b": [1, 2, 3]}},
                 {"b": 231},
+                {"c": 32231},
             ),
         ),
     ),
