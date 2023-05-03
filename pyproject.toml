@@ -12,7 +12,7 @@ dependencies = [
   "rdkit",
 ]
 requires-python = ">=3.11"
-version = "0.0.1"
+dynamic = ["version"]
 
 
 [project.optional-dependencies]
@@ -24,6 +24,7 @@ dev = [
   "pytest",
   "pytest-cov",
   "sphinx",
+  "build",
   "twine",
 ]
 
