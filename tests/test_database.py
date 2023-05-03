@@ -93,6 +93,10 @@ def _assert_properties_match(expected: dict, actual: dict) -> None:
             "molecule": rdkit.MolFromSmiles("CCC"),
             "properties": {"a": {"b": [1, 2, 3]}},
         },
+        {
+            "molecule": rdkit.AddHs(rdkit.MolFromSmiles("CCC")),
+            "properties": {"a": {"b": [1, 2, 3]}},
+        },
     ),
 )
 def single_entry_case(request: pytest.FixtureRequest) -> SingleEntryCase:
