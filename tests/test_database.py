@@ -87,6 +87,11 @@ def _assert_properties_match(expected: dict, actual: dict) -> None:
     assert json.dumps(expected) == json.dumps(actual)
 
 
+def _embed_molecule(molecule: rdkit.Mol) -> rdkit.Mol:
+    rdkit.EmbedMolecule(molecule)
+    return molecule
+
+
 @pytest.fixture(
     params=(
         {
@@ -95,6 +100,12 @@ def _assert_properties_match(expected: dict, actual: dict) -> None:
         },
         {
             "molecule": rdkit.AddHs(rdkit.MolFromSmiles("CCC")),
+            "properties": {"a": {"b": [1, 2, 3]}},
+        },
+        {
+            "molecule": _embed_molecule(
+                rdkit.AddHs(rdkit.MolFromSmiles("CCC"))
+            ),
             "properties": {"a": {"b": [1, 2, 3]}},
         },
     ),
