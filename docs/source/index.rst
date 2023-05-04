@@ -108,6 +108,7 @@ And finally you can retrieve the molecules with their keys:
       print(molecule["properties"])
 
 .. testoutput:: quickstart
+  :hide:
 
   {'is_interesting': False}
   {'dict_prop': {'array_prop': [0, 10, 20.5, 'hi']}}
