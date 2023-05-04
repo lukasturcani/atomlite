@@ -1,22 +1,24 @@
+import collections
 import json
 import pathlib
 import sqlite3
 import typing
-from collections import abc
 
 from atomlite._internal.json import Entry, Molecule
+
+DatabaseGetMolecules: typing.TypeAlias = collections.abc.Iterator[
+    tuple[str, Molecule]
+]
 
 
 class Database:
     """
     A molecular SQLite database.
 
-    Attributes:
-        connection:
-            An open database connection. Can be used to run
-            SQL commands against the database.
     """
 
+    #: An open database connection. Can be used to run SQL
+    #: commands against the database.
     connection: sqlite3.Connection
 
     def __init__(
@@ -40,12 +42,16 @@ class Database:
             "key TEXT PRIMARY KEY, molecule JSON)",
         )
 
-    def add_molecules(self, molecules: Entry | abc.Iterable[Entry]) -> None:
+    def add_molecules(
+        self,
+        molecules: Entry | collections.abc.Iterable[Entry],
+    ) -> None:
         """
         Add molecules to the database.
 
         Parameters:
-            molecules (Entry | list[Entry]): The molecules to add to the database.
+            molecules (Entry | list[Entry]):
+                The molecules to add to the database.
 
         """
 
@@ -59,8 +65,27 @@ class Database:
 
     def get_molecules(
         self,
-        keys: str | abc.Iterable[str],
-    ) -> abc.Iterator[tuple[str, Molecule]]:
+        keys: str | collections.abc.Iterable[str],
+    ) -> "DatabaseGetMolecules":
+        """
+        Get molecules from the database.
+
+        .. tip::
+
+            The molecules returned from the database are in JSON
+            format, you may need to convert them to something more
+            usable, for example, :mod:`rdkit` molecules with
+            :func:`.json_to_rdkit`.
+
+        Parameters:
+            keys (str | list[str]):
+                The keys of the molecules to retrieve from the
+                database.
+
+        Yields:
+            The key and molecule. The molecule is in JSON format.
+
+        """
         if isinstance(keys, str):
             keys = (keys,)
 

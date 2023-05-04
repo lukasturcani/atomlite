@@ -21,6 +21,11 @@ Conformer: typing.TypeAlias = list[list[float]]
 
 
 class Molecule(typing.TypedDict):
+    """
+    A JSON molecule.
+
+    """
+
     atomic_numbers: list[int]
     atom_charges: typing.NotRequired[list[int]]
     bonds: typing.NotRequired[Bonds]
