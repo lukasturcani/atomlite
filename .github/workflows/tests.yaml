@@ -67,3 +67,18 @@ jobs:
         run: |
           . /deps/venv/bin/activate
           pytest --cov=src --cov-report term-missing
+  doctest:
+    runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/lukasturcani/atomlite-testing-environment:latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+      - name: Install atomlite
+        run: |
+          . /deps/venv/bin/activate
+          pip install --no-deps -e .
+      - name: Run doctest
+        run: |
+          . /deps/venv/bin/activate
+          make -C docs doctest

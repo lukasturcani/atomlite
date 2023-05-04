@@ -4,6 +4,7 @@ default:
 
 # Build docs.
 docs:
+  rm -rf docs/source/_autosummary
   make -C docs html
   echo Docs are in $PWD/docs/build/html/index.html
 
@@ -29,6 +30,9 @@ check:
 
   echo
   ( set -x; pytest --cov=src --cov-report term-missing )
+
+  echo
+  ( set -x; make -C docs doctest )
 
   test $error = 0
 
