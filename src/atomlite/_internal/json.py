@@ -39,7 +39,7 @@ class Entry(dict):
     ) -> "Entry":
         entry = Entry()
         entry["key"] = key
-        entry["molecule"] = json.dumps(from_rdkit(molecule, properties))
+        entry["molecule"] = json.dumps(json_from_rdkit(molecule, properties))
         return entry
 
     @property
@@ -51,7 +51,7 @@ class Entry(dict):
         return json.loads(self["molecule"])
 
 
-def from_rdkit(
+def json_from_rdkit(
     molecule: rdkit.Mol,
     properties: dict[str, Json] | None,
 ) -> Molecule:
@@ -127,7 +127,7 @@ def from_rdkit(
     return d
 
 
-def to_rdkit(molecule: Molecule) -> rdkit.Mol:
+def json_to_rdkit(molecule: Molecule) -> rdkit.Mol:
     mol = rdkit.EditableMol(rdkit.Mol())
     for atomic_number in molecule["atomic_numbers"]:
         rdkit_atom = rdkit.Atom(atomic_number)

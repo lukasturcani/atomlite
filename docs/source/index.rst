@@ -12,6 +12,9 @@ Welcome to atomlite's documentation!
   :caption: Contents:
 
   Database <_autosummary/atomlite.Database>
+  Entry <_autosummary/atomlite.Entry>
+  json_from_rdkit <_autosummary/atomlite.json_from_rdkit>
+  json_to_rdkit <_autosummary/atomlie.json_to_rdkit>
   Modules <modules>
 
 

@@ -25,7 +25,7 @@ def test_database_stores_molecular_data_single_entry(
 ) -> None:
     database.add_molecules(single_entry_case.entry)
     retrieved = {
-        key: (atomlite.to_rdkit(molecule), molecule["properties"])
+        key: (atomlite.json_to_rdkit(molecule), molecule["properties"])
         for key, molecule in database.get_molecules(
             single_entry_case.entry.key
         )
@@ -45,7 +45,7 @@ def test_database_stores_molecular_data_multiple_entries(
 ) -> None:
     database.add_molecules(multiple_entry_case.entries)
     retrieved = {
-        key: (atomlite.to_rdkit(molecule), molecule["properties"])
+        key: (atomlite.json_to_rdkit(molecule), molecule["properties"])
         for key, molecule in database.get_molecules(
             entry.key for entry in multiple_entry_case.entries
         )

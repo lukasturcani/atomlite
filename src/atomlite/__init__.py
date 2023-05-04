@@ -1,9 +1,9 @@
 from atomlite._internal.database import Database
-from atomlite._internal.json import Entry, from_rdkit, to_rdkit
+from atomlite._internal.json import Entry, json_from_rdkit, json_to_rdkit
 
 __all__ = [
     "Database",
     "Entry",
-    "to_rdkit",
-    "from_rdkit",
+    "json_to_rdkit",
+    "json_from_rdkit",
 ]
