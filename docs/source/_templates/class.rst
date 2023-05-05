@@ -6,13 +6,13 @@
    :members:
 
    {% block methods %}
-   {% if methods %}
+   {% if methods and objname != 'Molecule' %}
    .. rubric:: {{ _('Methods') }}
 
    .. autosummary::
       :nosignatures:
    {% for item in methods %}
-      {%- if not item.startswith('_') %}
+      {%- if not item.startswith('_') and item not in inherited_members %}
       ~{{ name }}.{{ item }}
       {%- endif -%}
    {%- endfor %}
