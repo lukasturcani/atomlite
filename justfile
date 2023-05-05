@@ -45,3 +45,9 @@ fix:
 build-testing-environment:
   pip-compile -o docker_testing_environment/requirements.txt --extra dev pyproject.toml
   docker buildx build -t atomlite-testing-environment:latest ./docker_testing_environment
+
+# Enter the docker testing environment.
+enter-docker:
+  docker run -it --rm \
+    --mount type=bind,source="$(pwd)",target=/code \
+    atomlite-testing-environment:latest /bin/sh
