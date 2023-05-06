@@ -48,7 +48,7 @@ class Molecule(typing.TypedDict):
     aromatic_bonds: typing.NotRequired[AromaticBonds]
     """Aromatic bonds of the molecule."""
     properties: typing.NotRequired[Properties]
-    """User-supplied molecular properties."""
+    """User-supplied molecular properties as a JSON dictionary."""
     conformers: typing.NotRequired[list[Conformer]]
     """Conformers of the molecule."""
 
