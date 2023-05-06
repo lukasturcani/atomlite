@@ -1,5 +1,8 @@
 from atomlite._internal.database import Database
 from atomlite._internal.json import (
+    AromaticBonds,
+    Bonds,
+    Conformer,
     Entry,
     Json,
     Molecule,
@@ -10,7 +13,14 @@ from atomlite._internal.json import (
 Json = Json
 """A JSON value."""
 
+Conformer = Conformer
+"""A JSON conformer representation."""
+
 __all__ = [
+    "Bonds",
+    "AromaticBonds",
+    "Properties",
+    "Conformer",
     "Database",
     "Entry",
     "Json",

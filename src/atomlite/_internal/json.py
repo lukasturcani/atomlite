@@ -4,21 +4,32 @@ import typing
 import rdkit.Chem as rdkit
 
 Json: typing.TypeAlias = float | str | None | list["Json"] | dict[str, "Json"]
+Conformer: typing.TypeAlias = list[list[float]]
 Properties: typing.TypeAlias = dict[str, Json] | None
 
 
 class Bonds(typing.TypedDict):
+    """
+    JSON representation of bonds.
+    """
+
     atom1: list[int]
+    """The indices of the first atom of each bond."""
     atom2: list[int]
+    """The indices of the second atom of each bond."""
     order: list[float]
+    """The bond order of each bond."""
 
 
 class AromaticBonds(typing.TypedDict):
+    """
+    JSON representation of aromatic bonds.
+    """
+
     atom1: list[int]
+    """The indices of the first atom of each bond."""
     atom2: list[int]
-
-
-Conformer: typing.TypeAlias = list[list[float]]
+    """The indices of the second atom of each bond."""
 
 
 class Molecule(typing.TypedDict):
@@ -35,8 +46,11 @@ class Molecule(typing.TypedDict):
     dative_bonds: typing.NotRequired[Bonds]
     """Dative bonds of the molecule."""
     aromatic_bonds: typing.NotRequired[AromaticBonds]
-    properties: typing.NotRequired[dict[str, Json]]
+    """Aromatic bonds of the molecule."""
+    properties: typing.NotRequired[Properties]
+    """User-supplied molecular properties."""
     conformers: typing.NotRequired[list[Conformer]]
+    """Conformers of the molecule."""
 
 
 class Entry(dict):
