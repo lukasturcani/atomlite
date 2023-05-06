@@ -1,11 +1,9 @@
-import json
 import typing
 
 import rdkit.Chem as rdkit
 
 Json: typing.TypeAlias = float | str | None | list["Json"] | dict[str, "Json"]
 Conformer: typing.TypeAlias = list[list[float]]
-Properties: typing.TypeAlias = dict[str, Json] | None
 
 
 class Bonds(typing.TypedDict):
@@ -51,48 +49,6 @@ class Molecule(typing.TypedDict):
     """User-supplied molecular properties."""
     conformers: typing.NotRequired[list[Conformer]]
     """Conformers of the molecule."""
-
-
-class Entry(dict):
-    """
-    A database entry.
-    """
-
-    @staticmethod
-    def from_rdkit(
-        key: str,
-        molecule: rdkit.Mol,
-        properties: "Properties" = None,
-    ) -> "Entry":
-        """
-        Create an :class:`.Entry` from an :mod:`rdkit` molecule.
-
-        Parameters:
-            key:
-                The key used to uniquely identify the molecule
-                in the database.
-            molecule:
-                The molecule.
-            properties:
-                Properties of the molecule as a JSON dictionary.
-
-        Returns:
-            The entry.
-        """
-        entry = Entry()
-        entry["key"] = key
-        entry["molecule"] = json.dumps(json_from_rdkit(molecule, properties))
-        return entry
-
-    @property
-    def key(self) -> str:
-        """The molecular key."""
-        return self["key"]
-
-    @property
-    def molecule(self) -> Molecule:
-        """The molecule."""
-        return json.loads(self["molecule"])
 
 
 def json_from_rdkit(

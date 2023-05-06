@@ -1,8 +1,7 @@
-from atomlite._internal.database import Database
+from atomlite._internal.database import Database, Entry
 from atomlite._internal.json import (
     AromaticBonds,
     Bonds,
-    Entry,
     Json,
     Molecule,
     json_from_rdkit,

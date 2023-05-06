@@ -19,6 +19,44 @@ class MultipleEntryCase:
     molecules: tuple[rdkit.Mol, ...]
 
 
+def test_entry_is_replaced_on_update(database: atomlite.Database) -> None:
+    entry1 = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("C"),
+        properties={"a": 12},
+    )
+    database.add_molecules(entry1)
+    entry2 = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("CC"),
+        properties={"b": 32},
+    )
+    database.update_molecules(entry2, merge_properties=False)
+    _, json_molecule = next(database.get_molecules("first"))
+    molecule = atomlite.json_to_rdkit(json_molecule)
+    assert molecule.GetNumAtoms() == 2
+    assert json_molecule["properties"] == {"b": 32}
+
+
+def test_properties_get_merged_on_update(database: atomlite.Database) -> None:
+    entry1 = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("C"),
+        properties={"a": 12, "b": 10},
+    )
+    database.add_molecules(entry1)
+    entry2 = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("CC"),
+        properties={"b": 32},
+    )
+    database.update_molecules(entry2)
+    _, json_molecule = next(database.get_molecules("first"))
+    molecule = atomlite.json_to_rdkit(json_molecule)
+    assert molecule.GetNumAtoms() == 2
+    assert json_molecule["properties"] == {"a": 12, "b": 32}
+
+
 def test_database_stores_molecular_data_single_entry(
     database: atomlite.Database,
     single_entry_case: SingleEntryCase,
