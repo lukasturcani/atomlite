@@ -23,6 +23,15 @@ extensions = [
 
 autosummary_imported_members = True
 
+autodoc_typehints = "description"
+autodoc_member_order = "groupwise"
+autoclass_content = "both"
+autodoc_type_aliases = {
+    "DatabaseGetMolecules": "collections.abc.Iterator[tuple[str, Molecule]]",
+    "Properties": "dict[str, Json]",
+    "Json": "Json",
+}
+
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }

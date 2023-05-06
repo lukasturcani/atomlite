@@ -4,6 +4,7 @@ default:
 
 # Build docs.
 docs:
+  rm -rf docs/source/_autosummary
   make -C docs html
   echo Docs are in $PWD/docs/build/html/index.html
 
@@ -30,6 +31,9 @@ check:
   echo
   ( set -x; pytest --cov=src --cov-report term-missing )
 
+  echo
+  ( set -x; make -C docs doctest )
+
   test $error = 0
 
 # Auto-fix code issues.
@@ -41,3 +45,9 @@ fix:
 build-testing-environment:
   pip-compile -o docker_testing_environment/requirements.txt --extra dev pyproject.toml
   docker buildx build -t atomlite-testing-environment:latest ./docker_testing_environment
+
+# Enter the docker testing environment.
+enter-docker:
+  docker run -it --rm \
+    --mount type=bind,source="$(pwd)",target=/code \
+    atomlite-testing-environment:latest /bin/sh
