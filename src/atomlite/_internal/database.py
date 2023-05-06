@@ -157,7 +157,23 @@ class Database:
     def update_properties(
         self,
         properties: PropertyEntry | collections.abc.Iterable[PropertyEntry],
+        merge_properties: bool = True,
     ) -> None:
+        """
+        Update properties of molecules in the database.
+
+        Parameters:
+            properties (PropertyEntry | list[PropertyEntry]):
+                The properties to update.
+            merge_properties:
+                If ``True``, the molecular properties dictionary
+                will not replace the existing one. Only fields
+                which a present in both the update and the
+                database will be replaced. If ``False``, the
+                property dictionary of the update will completely
+                replace any existing property dictionary in the
+                database.
+        """
         raise NotImplementedError()
 
     def get_molecules(
