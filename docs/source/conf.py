@@ -29,6 +29,7 @@ autoclass_content = "both"
 autodoc_type_aliases = {
     "DatabaseGetMolecules": "collections.abc.Iterator[tuple[str, Molecule]]",
     "Properties": "dict[str, Json]",
+    "Json": "Json",
 }
 
 intersphinx_mapping = {
