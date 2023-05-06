@@ -86,10 +86,12 @@ class Entry(dict):
 
     @property
     def key(self) -> str:
+        """The molecular key."""
         return self["key"]
 
     @property
     def molecule(self) -> Molecule:
+        """The molecule."""
         return json.loads(self["molecule"])
 
 
