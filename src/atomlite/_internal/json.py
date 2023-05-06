@@ -97,8 +97,21 @@ class Entry(dict):
 
 def json_from_rdkit(
     molecule: rdkit.Mol,
-    properties: dict[str, Json] | None,
+    properties: "dict[str, Json] | None" = None,
 ) -> Molecule:
+    """
+    Create a JSON representation of an :mod:`rdkit` molecule.
+
+    Parameters:
+        molecule:
+            The molecule to convert to JSON.
+        properties:
+            User-supplied properties to be added to the JSON
+            representation.
+
+    Returns:
+        A JSON molecule.
+    """
     atomic_numbers = []
     atom_charges = []
     save_charges = False
@@ -172,6 +185,14 @@ def json_from_rdkit(
 
 
 def json_to_rdkit(molecule: Molecule) -> rdkit.Mol:
+    """
+    Create an :mod:`rdkit` molecule from a JSON representation.
+
+    Parameters:
+        molecule: The JSON molecule.
+    Returns:
+        The :mod:`rdkit` molecule.
+    """
     mol = rdkit.EditableMol(rdkit.Mol())
     for atomic_number in molecule["atomic_numbers"]:
         rdkit_atom = rdkit.Atom(atomic_number)
