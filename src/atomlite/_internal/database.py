@@ -14,12 +14,14 @@ DatabaseGetMolecules: typing.TypeAlias = collections.abc.Iterator[
 class Database:
     """
     A molecular SQLite database.
-
     """
 
-    #: An open database connection. Can be used to run SQL
-    #: commands against the database.
     connection: sqlite3.Connection
+    """
+    An open database connection.
+
+    Can be used to run SQL commands against the database.
+    """
 
     def __init__(
         self,
@@ -32,9 +34,7 @@ class Database:
                 The path to the database file.
             molecule_table:
                 The name of the table which stores the molecules.
-
         """
-
         self._molecule_table = molecule_table
         self.connection = sqlite3.connect(database)
         self.connection.execute(
@@ -52,9 +52,7 @@ class Database:
         Parameters:
             molecules (Entry | list[Entry]):
                 The molecules to add to the database.
-
         """
-
         if isinstance(molecules, Entry):
             molecules = (molecules,)
 
@@ -84,7 +82,6 @@ class Database:
 
         Yields:
             The key and molecule. The molecule is in JSON format.
-
         """
         if isinstance(keys, str):
             keys = (keys,)

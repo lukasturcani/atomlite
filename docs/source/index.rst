@@ -9,7 +9,7 @@ Welcome to atomlite's documentation!
 .. toctree::
   :hidden:
   :maxdepth: 2
-  :caption: Contents:
+  :caption: API:
 
   Database <_autosummary/atomlite.Database>
   Entry <_autosummary/atomlite.Entry>
