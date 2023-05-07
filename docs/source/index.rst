@@ -13,6 +13,7 @@ Welcome to atomlite's documentation!
 
   Database <_autosummary/atomlite.Database>
   Entry <_autosummary/atomlite.Entry>
+  PropertyEntry <_autosummary/atomlite.PropertyEntry>
   json_from_rdkit <_autosummary/atomlite.json_from_rdkit>
   json_to_rdkit <_autosummary/atomlite.json_to_rdkit>
   Modules <modules>
@@ -60,9 +61,10 @@ I'm happy to help!
 Quickstart
 ----------
 
-First you create a database:
+Adding molecules to the database
+................................
 
-.. testsetup:: quickstart
+.. testsetup:: adding_molecules
 
   import tempfile
   import os
@@ -70,54 +72,268 @@ First you create a database:
   temp_dir = tempfile.TemporaryDirectory()
   os.chdir(temp_dir.name)
 
+First you create a database:
 
-.. testcode:: quickstart
+.. testcode:: adding_molecules
 
   import atomlite
   db = atomlite.Database("molecules.db")
 
-Then you add some molecules and their JSON properties it:
+Then you make some molecular entries:
 
-.. testcode:: quickstart
+.. testcode:: adding_molecules
 
   import rdkit.Chem as rdkit
-  mol1 = atomlite.Entry.from_rdkit(
-      key="first",
-      molecule=rdkit.MolFromSmiles("C"),
-      properties={
-          "is_interesting": False,
-      },
-  )
-  mol2 = atomlite.Entry.from_rdkit(
-      key="second",
-      molecule=rdkit.MolFromSmiles("CN"),
-      properties={
-          "dict_prop": {
-            "array_prop": [0, 10, 20.5, "hi"],
-          },
-      },
-  )
-  db.add_molecules([mol1, mol2])
+  entry1 = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+  entry2 = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("CN"))
 
-And finally you can retrieve the molecules with their keys:
+And add them to the database:
 
-.. testcode:: quickstart
+.. testcode:: adding_molecules
 
-  for key, molecule in db.get_molecules(["first", "second"]):
-      rdkit_molecule = atomlite.json_to_rdkit(molecule)
-      print(molecule["properties"])
+  db.add_entries([entry1, entry2])
 
-.. testoutput:: quickstart
+Finally, you can retrieve the molecules with their keys:
+
+.. testcode:: adding_molecules
+
+  for entry in db.get_entries(["first", "second"]):
+      molecule = atomlite.json_to_rdkit(entry.molecule)
+      print(entry.properties)
+
+.. testoutput:: adding_molecules
   :hide:
 
-  {'is_interesting': False}
-  {'dict_prop': {'array_prop': [0, 10, 20.5, 'hi']}}
+  {}
+  {}
 
+.. tip::
 
-.. testcleanup:: quickstart
+  We can call :meth:`.Database.get_entries` with no parameters if
+  we want to retrieve all the molecules from the database.
+
+.. testcleanup:: adding_molecules
 
   os.chdir(old_dir)
 
+Adding molecular properties
+............................
+
+.. testsetup:: adding_properties
+
+  import tempfile
+  import os
+  old_dir = os.getcwd()
+  temp_dir = tempfile.TemporaryDirectory()
+  os.chdir(temp_dir.name)
+
+  import atomlite
+  db = atomlite.Database("molecules.db")
+  import rdkit.Chem as rdkit
+
+We can add JSON properties to our molecular entries:
+
+.. testcode:: adding_properties
+
+  entry = atomlite.Entry.from_rdkit(
+      key="first",
+      molecule=rdkit.MolFromSmiles("C"),
+      properties={"is_interesting": False},
+  )
+  db.add_entries(entry)
+
+And retrieve them:
+
+.. testcode:: adding_properties
+
+  for entry in db.get_entries():
+      print(entry.properties)
+
+.. testoutput:: adding_properties
+
+  {'is_interesting': False}
+
+.. testcleanup:: adding_properties
+
+  os.chdir(old_dir)
+
+Updating molecular properties
+.............................
+
+.. testsetup:: updating_properties
+
+  import tempfile
+  import os
+  old_dir = os.getcwd()
+  temp_dir = tempfile.TemporaryDirectory()
+  os.chdir(temp_dir.name)
+
+  import atomlite
+  db = atomlite.Database("molecules.db")
+  import rdkit.Chem as rdkit
+
+If we want to update molecular properties, we can use
+:meth:`.Database.update_properties`. First, let's
+write our initial entry:
+
+.. testcode:: updating_properties
+
+  entry = atomlite.Entry.from_rdkit(
+      key="first",
+      molecule=rdkit.MolFromSmiles("C"),
+      properties={"is_interesting": False},
+  )
+  db.add_entries(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_properties
+
+   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': False})
+
+We can change existing properties and add new ones:
+
+.. testcode:: updating_properties
+
+  entry = atomlite.PropertyEntry(
+      key="first",
+      properties={"is_interesting": True, "new": 20},
+  )
+  db.update_properties(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_properties
+
+   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': True, 'new': 20})
+
+Or remove properties:
+
+.. testcode:: updating_properties
+
+  entry = atomlite.PropertyEntry("first", {"new": 20})
+  db.update_properties(entry, merge_properties=False)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_properties
+
+   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'new': 20})
+
+.. testcleanup:: updating_properties
+
+  os.chdir(old_dir)
+
+.. note::
+
+   The parameter ``merge_properties=False`` causes the entire property dictionary to
+   be replaced for the one in the update.
+
+.. seealso::
+
+  * :meth:`.Database.update_properties`: For additional documentaiton.
+
+
+Updating entries
+................
+
+.. testsetup:: updating_entries
+
+  import tempfile
+  import os
+  old_dir = os.getcwd()
+  temp_dir = tempfile.TemporaryDirectory()
+  os.chdir(temp_dir.name)
+
+  import atomlite
+  db = atomlite.Database("molecules.db")
+  import rdkit.Chem as rdkit
+
+We can update whole molecular entries in the database.
+Let's write our initial entry:
+
+.. testcode:: updating_entries
+
+  entry = atomlite.Entry.from_rdkit(
+      key="first",
+      molecule=rdkit.MolFromSmiles("C"),
+      properties={"is_interesting": False},
+  )
+  db.add_entries(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_entries
+
+   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': False})
+
+
+We can change the molecule:
+
+.. testcode:: updating_entries
+
+  entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("Br"))
+  db.update_entries(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_entries
+
+   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'is_interesting': False})
+
+Change existing properties and add new ones:
+
+.. testcode:: updating_entries
+
+  entry = atomlite.Entry.from_rdkit(
+      key="first",
+      molecule=rdkit.MolFromSmiles("Br"),
+      properties={"is_interesting": True, "new": 20},
+  )
+  db.update_entries(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_entries
+
+   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'is_interesting': True, 'new': 20})
+
+Or remove properties:
+
+.. testcode:: updating_entries
+
+  entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("Br"), {"new": 20})
+  db.update_entries(entry, merge_properties=False)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_entries
+
+   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'new': 20})
+
+.. testcleanup:: updating_entries
+
+  os.chdir(old_dir)
+
+.. note::
+
+   The parameter ``merge_properties=False`` causes the entire property dictionary to
+   be replaced for the one in the update.
+
+.. seealso::
+
+  * :meth:`.Database.update_entries`: For additional documentaiton.
+
+Using an in-memory database
+...........................
+
+If you do not wish to write your database to a file, but
+only keep it in memory, you can do that with:
+
+.. testcode:: in_memory_database
+
+  import atomlite
+  db = atomlite.Database(":memory:")
 
 
 Indices and tables

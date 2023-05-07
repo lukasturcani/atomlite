@@ -1,11 +1,9 @@
-import json
 import typing
 
 import rdkit.Chem as rdkit
 
 Json: typing.TypeAlias = float | str | None | list["Json"] | dict[str, "Json"]
 Conformer: typing.TypeAlias = list[list[float]]
-Properties: typing.TypeAlias = dict[str, Json] | None
 
 
 class Bonds(typing.TypedDict):
@@ -47,68 +45,17 @@ class Molecule(typing.TypedDict):
     """Dative bonds of the molecule."""
     aromatic_bonds: typing.NotRequired[AromaticBonds]
     """Aromatic bonds of the molecule."""
-    properties: "typing.NotRequired[dict[str, Json]]"
-    """User-supplied molecular properties."""
     conformers: typing.NotRequired[list[Conformer]]
     """Conformers of the molecule."""
 
 
-class Entry(dict):
-    """
-    A database entry.
-    """
-
-    @staticmethod
-    def from_rdkit(
-        key: str,
-        molecule: rdkit.Mol,
-        properties: "Properties" = None,
-    ) -> "Entry":
-        """
-        Create an :class:`.Entry` from an :mod:`rdkit` molecule.
-
-        Parameters:
-            key:
-                The key used to uniquely identify the molecule
-                in the database.
-            molecule:
-                The molecule.
-            properties:
-                Properties of the molecule as a JSON dictionary.
-
-        Returns:
-            The entry.
-        """
-        entry = Entry()
-        entry["key"] = key
-        entry["molecule"] = json.dumps(json_from_rdkit(molecule, properties))
-        return entry
-
-    @property
-    def key(self) -> str:
-        """The molecular key."""
-        return self["key"]
-
-    @property
-    def molecule(self) -> Molecule:
-        """The molecule."""
-        return json.loads(self["molecule"])
-
-
-def json_from_rdkit(
-    molecule: rdkit.Mol,
-    properties: "dict[str, Json] | None" = None,
-) -> Molecule:
+def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
     """
     Create a JSON representation of an :mod:`rdkit` molecule.
 
     Parameters:
         molecule:
             The molecule to convert to JSON.
-        properties:
-            User-supplied properties to be added to the JSON
-            representation.
-
     Returns:
         A JSON molecule.
     """
@@ -168,14 +115,12 @@ def json_from_rdkit(
     }
     if save_charges:
         d["atom_charges"] = atom_charges
-    if bonds:
+    if bonds["atom1"]:
         d["bonds"] = bonds
-    if dative_bonds:
+    if dative_bonds["atom1"]:
         d["dative_bonds"] = dative_bonds
-    if aromatic_bonds:
+    if aromatic_bonds["atom1"]:
         d["aromatic_bonds"] = aromatic_bonds
-    if properties is not None and properties:
-        d["properties"] = properties
     if molecule.GetNumConformers() > 0:
         d["conformers"] = [
             conformer.GetPositions().tolist()
