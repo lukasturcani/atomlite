@@ -13,6 +13,7 @@ Welcome to atomlite's documentation!
 
   Database <_autosummary/atomlite.Database>
   Entry <_autosummary/atomlite.Entry>
+  PropertyEntry <_autosummary/atomlite.PropertyEntry>
   json_from_rdkit <_autosummary/atomlite.json_from_rdkit>
   json_to_rdkit <_autosummary/atomlite.json_to_rdkit>
   Modules <modules>
@@ -159,10 +160,74 @@ And retrieve them:
 Updating molecular properties
 .............................
 
-If we  want to update molecular properties, we
+.. testsetup:: updating_properties
 
-Removing molecular properties
-.............................
+  import tempfile
+  import os
+  old_dir = os.getcwd()
+  temp_dir = tempfile.TemporaryDirectory()
+  os.chdir(temp_dir.name)
+
+  import atomlite
+  db = atomlite.Database("molecules.db")
+  import rdkit.Chem as rdkit
+
+If we want to update molecular properties, we can use
+:meth:`.Database.update_properties`. First, let's
+write our initial entry:
+
+.. testcode:: updating_properties
+
+  entry = atomlite.Entry.from_rdkit(
+      key="first",
+      molecule=rdkit.MolFromSmiles("C"),
+      properties={"is_interesting": False},
+  )
+  db.add_entries(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_properties
+
+   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': False})
+
+We can change existing properties and add new ones:
+
+.. testcode:: updating_properties
+
+  entry = atomlite.PropertyEntry(
+      key="first",
+      properties={"is_interesting": True, "new": 20},
+  )
+  db.update_properties(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_properties
+
+   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': True, 'new': 20})
+
+Or remove properties:
+
+.. testcode:: updating_properties
+
+  entry = atomlite.PropertyEntry("first", {"new": 20})
+  db.update_properties(entry, merge_properties=False)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_properties
+
+   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'new': 20})
+
+.. note::
+
+   The parameter ``merge_properties=False`` causes the entire property dictionary to
+   be replaced for the one in the update.
+
+.. testcleanup:: updating_properties
+
+  os.chdir(old_dir)
 
 Updating entries
 ................
@@ -211,19 +276,22 @@ We can change the molecule:
 
    Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'is_interesting': False})
 
-
-Add new properties:
+Change existing properties and add new ones:
 
 .. testcode:: updating_entries
 
-  entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("Br"), {"new": 20})
+  entry = atomlite.Entry.from_rdkit(
+      key="first",
+      molecule=rdkit.MolFromSmiles("Br"),
+      properties={"is_interesting": True, "new": 20},
+  )
   db.update_entries(entry)
   for entry in db.get_entries():
       print(entry)
 
 .. testoutput:: updating_entries
 
-   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'is_interesting': False, 'new': 20})
+   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'is_interesting': True, 'new': 20})
 
 Or remove properties:
 

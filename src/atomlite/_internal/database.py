@@ -228,6 +228,18 @@ class Database:
         entries: PropertyEntry | collections.abc.Iterable[PropertyEntry],
         merge_properties: bool = True,
     ) -> None:
+        """
+        Update molecular properties.
+
+        Parameters:
+            entries (Entry | list[Entry]):
+                The entries to update in the database.
+            merge_properties:
+                If ``True``, the molecular properties will be
+                merged rather than replaced. Properties present
+                in both the update and the database will be
+                overwritten.
+        """
         if isinstance(entries, PropertyEntry):
             entries = (entries,)
 
