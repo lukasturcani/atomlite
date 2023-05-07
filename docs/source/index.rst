@@ -109,7 +109,7 @@ Finally, you can retrieve the molecules with their keys:
 
 .. tip::
 
-  We can can call ``db.get_entries()`` with no parameters if
+  We can call ``db.get_entries()`` with no parameters if
   we want to retrieve all the molecules from the database.
 
 .. testcleanup:: adding_molecules
