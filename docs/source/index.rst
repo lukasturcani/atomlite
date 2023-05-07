@@ -97,13 +97,13 @@ Then you add some molecules and their JSON properties it:
           },
       },
   )
-  db.add_molecules([mol1, mol2])
+  db.add_entries([mol1, mol2])
 
 And finally you can retrieve the molecules with their keys:
 
 .. testcode:: quickstart
 
-  for key, molecule in db.get_molecules(["first", "second"]):
+  for key, molecule in db.get_entries(["first", "second"]):
       rdkit_molecule = atomlite.json_to_rdkit(molecule)
       print(molecule["properties"])
 
