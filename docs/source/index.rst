@@ -151,6 +151,13 @@ And retrieve them:
 
   os.chdir(old_dir)
 
+Updating molecular properties
+.............................
+
+If we  want to update molecular properties, we
+
+Removing molecular properties
+.............................
 
 Updating entries
 ................
@@ -167,7 +174,8 @@ Updating entries
   db = atomlite.Database("molecules.db")
   import rdkit.Chem as rdkit
 
-We can update entries in the database
+We can update whole molecular entries in the database.
+Let's write our initial entry:
 
 .. testcode:: updating_entries
 
@@ -177,25 +185,78 @@ We can update entries in the database
       properties={"is_interesting": False},
   )
   db.add_entries(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_entries
+
+   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': False})
+
+
+We can change the molecule:
+
+.. testcode:: updating_entries
+
+  entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("Br"))
+  db.update_entries(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_entries
+
+   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'is_interesting': False})
+
+
+Add new properties:
+
+.. testcode:: updating_entries
+
+  entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("Br"), {"new": 20})
+  db.update_entries(entry)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_entries
+
+   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'is_interesting': False, 'new': 20})
+
+Or remove properties:
+
+.. testcode:: updating_entries
+
+  entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("Br"), {"new": 20})
+  db.update_entries(entry, merge_properties=False)
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: updating_entries
+
+   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'new': 20})
+
+.. note::
+
+   The parameter ``merge_properties=False`` causes the entire property dictionary to
+   be replaced for the one in the update.
 
 .. testcleanup:: updating_entries
 
   os.chdir(old_dir)
 
-Updating molecular properties
-.............................
-
-If we only want to update molecular properties, we
-can do that too:
 
 
 
 
-Removing molecular properties
-.............................
 
 Using an in-memory database
 ...........................
+
+If you do not wish to write your database to a file, but
+only keep it in memory, you can do that with:
+
+.. testcode:: in_memory_database
+
+  import atomlite
+  db = atomlite.Database(":memory:")
 
 
 Indices and tables
