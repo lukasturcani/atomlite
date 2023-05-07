@@ -106,6 +106,11 @@ Finally, you can retrieve the molecules with their keys:
   {}
   {}
 
+.. tip::
+
+  We can can call ``db.get_entries()`` with no parameters if
+  we want to retrieve all the molecules from the database.
+
 .. testcleanup:: adding_molecules
 
   os.chdir(old_dir)
@@ -241,11 +246,6 @@ Or remove properties:
 .. testcleanup:: updating_entries
 
   os.chdir(old_dir)
-
-
-
-
-
 
 Using an in-memory database
 ...........................
