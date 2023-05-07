@@ -159,6 +159,9 @@ Updating molecular properties
 Removing molecular properties
 .............................
 
+Using an in-memory database
+...........................
+
 
 Indices and tables
 ==================

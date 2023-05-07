@@ -57,6 +57,19 @@ def test_properties_get_merged_on_update(database: atomlite.Database) -> None:
     assert entry.properties == {"a": 12, "b": 32}
 
 
+def test_get_entries_returns_all_entries(
+    database: atomlite.Database,
+) -> None:
+    entry1 = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+    entry2 = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("C"))
+    entry3 = atomlite.Entry.from_rdkit("third", rdkit.MolFromSmiles("C"))
+    database.add_entries([entry1, entry2, entry3])
+
+    retrieved = [entry.key for entry in database.get_entries()]
+    assert len(retrieved) == 3
+    assert set(retrieved) == {"first", "second", "third"}
+
+
 def test_database_stores_molecular_data_single_entry(
     database: atomlite.Database,
     single_entry_case: SingleEntryCase,
