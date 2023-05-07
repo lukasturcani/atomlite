@@ -31,11 +31,11 @@ def test_entry_is_replaced_on_update(database: atomlite.Database) -> None:
         molecule=rdkit.MolFromSmiles("CC"),
         properties={"b": 32},
     )
-    database.update_molecules(entry2, merge_properties=False)
-    _, json_molecule, properties = next(database.get_entries("first"))
-    molecule = atomlite.json_to_rdkit(json_molecule)
+    database.update_entries(entry2, merge_properties=False)
+    entry = next(database.get_entries("first"))
+    molecule = atomlite.json_to_rdkit(entry.molecule)
     assert molecule.GetNumAtoms() == 2
-    assert json_molecule["properties"] == {"b": 32}
+    assert entry.properties == {"b": 32}
 
 
 def test_properties_get_merged_on_update(database: atomlite.Database) -> None:
@@ -50,11 +50,11 @@ def test_properties_get_merged_on_update(database: atomlite.Database) -> None:
         molecule=rdkit.MolFromSmiles("CC"),
         properties={"b": 32},
     )
-    database.update_molecules(entry2)
-    _, json_molecule, properties = next(database.get_entries("first"))
-    molecule = atomlite.json_to_rdkit(json_molecule)
+    database.update_entries(entry2)
+    entry = next(database.get_entries("first"))
+    molecule = atomlite.json_to_rdkit(entry.molecule)
     assert molecule.GetNumAtoms() == 2
-    assert json_molecule["properties"] == {"a": 12, "b": 32}
+    assert entry.properties == {"a": 12, "b": 32}
 
 
 def test_database_stores_molecular_data_single_entry(

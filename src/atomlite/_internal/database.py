@@ -99,34 +99,34 @@ class Database:
 
     def add_entries(
         self,
-        molecules: Entry | collections.abc.Iterable[Entry],
+        entries: Entry | collections.abc.Iterable[Entry],
     ) -> None:
         """
-        Add molecules to the database.
+        Add molecular entries to the database.
 
         Parameters:
-            molecules (Entry | list[Entry]):
+            entries (Entry | list[Entry]):
                 The molecules to add to the database.
         """
-        if isinstance(molecules, Entry):
-            molecules = (molecules,)
+        if isinstance(entries, Entry):
+            entries = (entries,)
 
         self.connection.executemany(
             f"INSERT INTO {self._molecule_table} "
             "VALUES (:key, :molecule, :properties)",
-            map(_entry_to_sqlite, molecules),
+            map(_entry_to_sqlite, entries),
         )
 
-    def update_molecules(
+    def update_entries(
         self,
-        molecules: Entry | collections.abc.Iterable[Entry],
+        entries: Entry | collections.abc.Iterable[Entry],
         merge_properties: bool = True,
     ) -> None:
         """
         Update molecules in the database.
 
         Parameters:
-            molecules (Entry | list[Entry]):
+            entries (Entry | list[Entry]):
                 The molecule entries to update in the database.
             merge_properties:
                 If ``True``, the molecular properties dictionary
@@ -137,8 +137,8 @@ class Database:
                 replace any existing property dictionary in the
                 database.
         """
-        if isinstance(molecules, Entry):
-            molecules = (molecules,)
+        if isinstance(entries, Entry):
+            entries = (entries,)
 
         if merge_properties:
             # self.connection.executemany(
@@ -152,8 +152,8 @@ class Database:
         else:
             self.connection.executemany(
                 f"UPDATE {self._molecule_table} "
-                "SET molecule=:molecule WHERE key=:key",
-                molecules,
+                "SET molecule=:molecule, properties=:properties WHERE key=:key",
+                map(_entry_to_sqlite, entries),
             )
 
     def get_entries(
@@ -175,7 +175,7 @@ class Database:
                 The keys of the molecules to retrieve from the
                 database.
         Yields:
-            The key and molecule. The molecule is in JSON format.
+            A molecular entry matching `keys`.
         """
         if isinstance(keys, str):
             keys = (keys,)
