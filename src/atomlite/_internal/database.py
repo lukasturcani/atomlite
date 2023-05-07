@@ -80,6 +80,12 @@ class PropertyEntry:
     """User-defined molecular properties."""
 
 
+def _property_entry_to_sqlite(entry: PropertyEntry) -> dict:
+    d = asdict(entry)
+    d["properties"] = json.dumps(d["properties"])
+    return d
+
+
 class Database:
     """
     A molecular SQLite database.
@@ -222,4 +228,20 @@ class Database:
         entries: PropertyEntry | collections.abc.Iterable[PropertyEntry],
         merge_properties: bool = True,
     ) -> None:
-        pass
+        if isinstance(entries, PropertyEntry):
+            entries = (entries,)
+
+        if merge_properties:
+            self.connection.executemany(
+                f"UPDATE {self._molecule_table} "
+                "SET properties=json_patch(properties,:properties) "
+                "WHERE key=:key",
+                map(_property_entry_to_sqlite, entries),
+            )
+        else:
+            self.connection.executemany(
+                f"UPDATE {self._molecule_table} "
+                "SET properties=:properties "
+                "WHERE key=:key",
+                map(_property_entry_to_sqlite, entries),
+            )
