@@ -103,9 +103,9 @@ And finally you can retrieve the molecules with their keys:
 
 .. testcode:: quickstart
 
-  for key, molecule in db.get_entries(["first", "second"]):
-      rdkit_molecule = atomlite.json_to_rdkit(molecule)
-      print(molecule["properties"])
+  for entry in db.get_entries(["first", "second"]):
+      molecule = atomlite.json_to_rdkit(entry.molecule)
+      print(entry.properties)
 
 .. testoutput:: quickstart
   :hide:
