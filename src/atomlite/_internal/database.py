@@ -155,7 +155,7 @@ class Database:
 
     def get_entries(
         self,
-        keys: str | collections.abc.Iterable[str],
+        keys: str | collections.abc.Iterable[str] | None = None,
     ) -> "DatabaseGetMolecules":
         """
         Get molecular entries from the database.
@@ -168,12 +168,24 @@ class Database:
             :func:`.json_to_rdkit`.
 
         Parameters:
-            keys (str | list[str]):
+            keys (str | list[str] | None):
                 The keys of the molecules to retrieve from the
-                database.
+                database. If ``None``, all entries will be returned.
         Yields:
             A molecular entry matching `keys`.
         """
+
+        if keys is None:
+            for key, molecule, properties in self.connection.execute(
+                f"SELECT * FROM {self._molecule_table}",
+            ):
+                yield Entry(
+                    key=key,
+                    molecule=json.loads(molecule),
+                    properties=json.loads(properties),
+                )
+            return
+
         if isinstance(keys, str):
             keys = (keys,)
 

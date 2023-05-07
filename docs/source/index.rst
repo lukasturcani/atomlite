@@ -63,9 +63,7 @@ Quickstart
 Adding molecules to the database
 ................................
 
-
-
-.. testsetup:: quickstart
+.. testsetup:: adding_molecules
 
   import tempfile
   import os
@@ -75,48 +73,85 @@ Adding molecules to the database
 
 First you create a database:
 
-.. testcode:: quickstart
+.. testcode:: adding_molecules
 
   import atomlite
   db = atomlite.Database("molecules.db")
 
 Then you make some molecular entries:
 
-.. testcode:: quickstart
+.. testcode:: adding_molecules
 
   import rdkit.Chem as rdkit
-  mol1 = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
-  mol2 = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("CN"))
+  entry1 = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+  entry2 = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("CN"))
 
 And add them to the database:
 
-.. testcode:: quickstart
+.. testcode:: adding_molecules
 
-  db.add_entries([mol1, mol2])
+  db.add_entries([entry1, entry2])
 
 Finally, you can retrieve the molecules with their keys:
 
-.. testcode:: quickstart
+.. testcode:: adding_molecules
 
   for entry in db.get_entries(["first", "second"]):
       molecule = atomlite.json_to_rdkit(entry.molecule)
       print(entry.properties)
 
-.. testoutput:: quickstart
+.. testoutput:: adding_molecules
   :hide:
 
   {}
   {}
 
-
-.. testcleanup:: quickstart
+.. testcleanup:: adding_molecules
 
   os.chdir(old_dir)
 
-
-
 Adding molecular properties
 ............................
+
+.. testsetup:: adding_properties
+
+  import tempfile
+  import os
+  old_dir = os.getcwd()
+  temp_dir = tempfile.TemporaryDirectory()
+  os.chdir(temp_dir.name)
+
+  import atomlite
+  db = atomlite.Database("molecules.db")
+  import rdkit.Chem as rdkit
+
+We can add JSON properties to our molecular entries:
+
+.. testcode:: adding_properties
+
+  entry = atomlite.Entry.from_rdkit(
+      key="first",
+      molecule=rdkit.MolFromSmiles("C"),
+      properties={"is_interesting": False},
+  )
+  db.add_entries(entry)
+
+And retrieve them:
+
+.. testcode:: adding_properties
+
+  for entry in db.get_entries():
+      print(entry.properties)
+
+.. testoutput:: adding_properties
+  :hide:
+
+  {'is_interesting': False}
+
+.. testcleanup:: adding_properties
+
+  os.chdir(old_dir)
+
 
 Updating molecular properties
 .............................
