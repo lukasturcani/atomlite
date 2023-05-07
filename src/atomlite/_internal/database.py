@@ -129,30 +129,27 @@ class Database:
             entries (Entry | list[Entry]):
                 The molecule entries to update in the database.
             merge_properties:
-                If ``True``, the molecular properties dictionary
-                will not replace the existing one. Only fields
-                which a present in both the update and the
-                database will be replaced. If ``False``, the
-                property dictionary of the update will completely
-                replace any existing property dictionary in the
-                database.
+                If ``True``, the molecular properties will be
+                merged rather than replaced. Properties present
+                in both the update and the database will be
+                overwritten.
         """
         if isinstance(entries, Entry):
             entries = (entries,)
 
         if merge_properties:
-            # self.connection.executemany(
-            #     f"UPDATE {self._molecule_table} "
-            #     "SET molecule=json_set(molecule, '$.molecule', :molecule) "
-            #     "SET molecule=json_set(molecule, '$.properties', '{\"b\": 32}}') "
-            #     "WHERE key=:key",
-            #     ({"molecule": entry.molecule["molecule"], "properties": molecule["properties"], "key"} for entry in molecules),
-            # )
-            pass
+            self.connection.executemany(
+                f"UPDATE {self._molecule_table} "
+                "SET molecule=:molecule, "
+                "properties=json_patch(properties,:properties) "
+                "WHERE key=:key",
+                map(_entry_to_sqlite, entries),
+            )
         else:
             self.connection.executemany(
                 f"UPDATE {self._molecule_table} "
-                "SET molecule=:molecule, properties=:properties WHERE key=:key",
+                "SET molecule=:molecule, properties=:properties "
+                "WHERE key=:key",
                 map(_entry_to_sqlite, entries),
             )
 
