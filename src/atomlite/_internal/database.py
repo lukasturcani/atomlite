@@ -97,7 +97,7 @@ class Database:
             "properties JSON NOT NULL)",
         )
 
-    def add_molecules(
+    def add_entries(
         self,
         molecules: Entry | collections.abc.Iterable[Entry],
     ) -> None:

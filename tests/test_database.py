@@ -25,7 +25,7 @@ def test_entry_is_replaced_on_update(database: atomlite.Database) -> None:
         molecule=rdkit.MolFromSmiles("C"),
         properties={"a": 12},
     )
-    database.add_molecules(entry1)
+    database.add_entries(entry1)
     entry2 = atomlite.Entry.from_rdkit(
         key="first",
         molecule=rdkit.MolFromSmiles("CC"),
@@ -44,7 +44,7 @@ def test_properties_get_merged_on_update(database: atomlite.Database) -> None:
         molecule=rdkit.MolFromSmiles("C"),
         properties={"a": 12, "b": 10},
     )
-    database.add_molecules(entry1)
+    database.add_entries(entry1)
     entry2 = atomlite.Entry.from_rdkit(
         key="first",
         molecule=rdkit.MolFromSmiles("CC"),
@@ -61,7 +61,7 @@ def test_database_stores_molecular_data_single_entry(
     database: atomlite.Database,
     single_entry_case: SingleEntryCase,
 ) -> None:
-    database.add_molecules(single_entry_case.entry)
+    database.add_entries(single_entry_case.entry)
     retrieved = {
         entry.key: (atomlite.json_to_rdkit(entry.molecule), entry.properties)
         for entry in database.get_entries(single_entry_case.entry.key)
@@ -76,7 +76,7 @@ def test_database_stores_molecular_data_multiple_entries(
     database: atomlite.Database,
     multiple_entry_case: MultipleEntryCase,
 ) -> None:
-    database.add_molecules(multiple_entry_case.entries)
+    database.add_entries(multiple_entry_case.entries)
     retrieved = {
         entry.key: (atomlite.json_to_rdkit(entry.molecule), entry.properties)
         for entry in database.get_entries(
