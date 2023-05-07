@@ -220,14 +220,19 @@ Or remove properties:
 
    Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'new': 20})
 
+.. testcleanup:: updating_properties
+
+  os.chdir(old_dir)
+
 .. note::
 
    The parameter ``merge_properties=False`` causes the entire property dictionary to
    be replaced for the one in the update.
 
-.. testcleanup:: updating_properties
+.. seealso::
 
-  os.chdir(old_dir)
+  * :meth:`.Database.update_properties`: For additional documentaiton.
+
 
 Updating entries
 ................
@@ -306,14 +311,18 @@ Or remove properties:
 
    Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'new': 20})
 
+.. testcleanup:: updating_entries
+
+  os.chdir(old_dir)
+
 .. note::
 
    The parameter ``merge_properties=False`` causes the entire property dictionary to
    be replaced for the one in the update.
 
-.. testcleanup:: updating_entries
+.. seealso::
 
-  os.chdir(old_dir)
+  * :meth:`.Database.update_entries`: For additional documentaiton.
 
 Using an in-memory database
 ...........................
