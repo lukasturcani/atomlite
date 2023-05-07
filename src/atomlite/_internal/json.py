@@ -115,11 +115,11 @@ def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
     }
     if save_charges:
         d["atom_charges"] = atom_charges
-    if bonds:
+    if bonds["atom1"]:
         d["bonds"] = bonds
-    if dative_bonds:
+    if dative_bonds["atom1"]:
         d["dative_bonds"] = dative_bonds
-    if aromatic_bonds:
+    if aromatic_bonds["atom1"]:
         d["aromatic_bonds"] = aromatic_bonds
     if molecule.GetNumConformers() > 0:
         d["conformers"] = [

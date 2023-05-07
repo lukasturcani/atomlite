@@ -144,7 +144,6 @@ And retrieve them:
       print(entry.properties)
 
 .. testoutput:: adding_properties
-  :hide:
 
   {'is_interesting': False}
 
@@ -153,8 +152,44 @@ And retrieve them:
   os.chdir(old_dir)
 
 
+Updating entries
+................
+
+.. testsetup:: updating_entries
+
+  import tempfile
+  import os
+  old_dir = os.getcwd()
+  temp_dir = tempfile.TemporaryDirectory()
+  os.chdir(temp_dir.name)
+
+  import atomlite
+  db = atomlite.Database("molecules.db")
+  import rdkit.Chem as rdkit
+
+We can update entries in the database
+
+.. testcode:: updating_entries
+
+  entry = atomlite.Entry.from_rdkit(
+      key="first",
+      molecule=rdkit.MolFromSmiles("C"),
+      properties={"is_interesting": False},
+  )
+  db.add_entries(entry)
+
+.. testcleanup:: updating_entries
+
+  os.chdir(old_dir)
+
 Updating molecular properties
 .............................
+
+If we only want to update molecular properties, we
+can do that too:
+
+
+
 
 Removing molecular properties
 .............................
