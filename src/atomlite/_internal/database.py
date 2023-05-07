@@ -64,6 +64,22 @@ def _entry_to_sqlite(entry: Entry) -> dict:
     return d
 
 
+@dataclass(frozen=True, slots=True)
+class PropertyEntry:
+    """
+    A database property entry.
+
+    Parameters:
+        key: Key used to uniquely identify the molecule.
+        properties: User-defined molecular properties.
+    """
+
+    key: str
+    """Key used to uniquely identify the molecule."""
+    properties: "dict[str, Json]"
+    """User-defined molecular properties."""
+
+
 class Database:
     """
     A molecular SQLite database.
@@ -200,3 +216,10 @@ class Database:
                 molecule=json.loads(molecule),
                 properties=json.loads(properties),
             )
+
+    def update_properties(
+        self,
+        entries: PropertyEntry | collections.abc.Iterable[PropertyEntry],
+        merge_properties: bool = True,
+    ) -> None:
+        pass
