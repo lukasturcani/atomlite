@@ -32,7 +32,7 @@ def test_entry_is_replaced_on_update(database: atomlite.Database) -> None:
         properties={"b": 32},
     )
     database.update_molecules(entry2, merge_properties=False)
-    _, json_molecule = next(database.get_molecules("first"))
+    _, json_molecule, properties = next(database.get_entries("first"))
     molecule = atomlite.json_to_rdkit(json_molecule)
     assert molecule.GetNumAtoms() == 2
     assert json_molecule["properties"] == {"b": 32}
@@ -51,7 +51,7 @@ def test_properties_get_merged_on_update(database: atomlite.Database) -> None:
         properties={"b": 32},
     )
     database.update_molecules(entry2)
-    _, json_molecule = next(database.get_molecules("first"))
+    _, json_molecule, properties = next(database.get_entries("first"))
     molecule = atomlite.json_to_rdkit(json_molecule)
     assert molecule.GetNumAtoms() == 2
     assert json_molecule["properties"] == {"a": 12, "b": 32}
@@ -63,18 +63,13 @@ def test_database_stores_molecular_data_single_entry(
 ) -> None:
     database.add_molecules(single_entry_case.entry)
     retrieved = {
-        key: (atomlite.json_to_rdkit(molecule), molecule["properties"])
-        for key, molecule in database.get_molecules(
-            single_entry_case.entry.key
-        )
+        entry.key: (atomlite.json_to_rdkit(entry.molecule), entry.properties)
+        for entry in database.get_entries(single_entry_case.entry.key)
     }
     actual, props = retrieved[single_entry_case.entry.key]
     _assert_conformers_match(single_entry_case.molecule, actual)
     _assert_atom_numbers_match(single_entry_case.molecule, actual)
-    _assert_properties_match(
-        single_entry_case.entry.molecule["properties"],
-        props,
-    )
+    _assert_properties_match(single_entry_case.entry.properties, props)
 
 
 def test_database_stores_molecular_data_multiple_entries(
@@ -83,8 +78,8 @@ def test_database_stores_molecular_data_multiple_entries(
 ) -> None:
     database.add_molecules(multiple_entry_case.entries)
     retrieved = {
-        key: (atomlite.json_to_rdkit(molecule), molecule["properties"])
-        for key, molecule in database.get_molecules(
+        entry.key: (atomlite.json_to_rdkit(entry.molecule), entry.properties)
+        for entry in database.get_entries(
             entry.key for entry in multiple_entry_case.entries
         )
     }
@@ -97,7 +92,7 @@ def test_database_stores_molecular_data_multiple_entries(
         actual, props = retrieved[entry.key]
         _assert_conformers_match(molecule, actual)
         _assert_atom_numbers_match(molecule, actual)
-        _assert_properties_match(entry.molecule["properties"], props)
+        _assert_properties_match(entry.properties, props)
         assert rdkit.MolToSmiles(molecule) == rdkit.MolToSmiles(actual)
 
 
@@ -123,7 +118,10 @@ def _assert_atom_numbers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
         assert atom1.GetNumImplicitHs() == atom2.GetNumImplicitHs()
 
 
-def _assert_properties_match(expected: dict, actual: dict) -> None:
+def _assert_properties_match(
+    expected: dict | None,
+    actual: dict | None,
+) -> None:
     assert json.dumps(expected) == json.dumps(actual)
 
 

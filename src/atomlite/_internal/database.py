@@ -3,21 +3,33 @@ import json
 import pathlib
 import sqlite3
 import typing
+from dataclasses import asdict, dataclass, field
 
 import rdkit.Chem as rdkit
 
 from atomlite._internal.json import Json, Molecule, json_from_rdkit
 
-DatabaseGetMolecules: typing.TypeAlias = collections.abc.Iterator[
-    tuple[str, Molecule]
-]
 Properties: typing.TypeAlias = dict[str, Json] | None
+DatabaseGetMolecules: typing.TypeAlias = collections.abc.Iterator["Entry"]
 
 
-class Entry(dict):
+@dataclass(frozen=True, slots=True)
+class Entry:
     """
     A database entry.
+
+    Parameters:
+        key: Key used to uniquely identify the molecule.
+        molecule: The molecule in JSON format.
+        properties: User-defined molecular properties.
     """
+
+    key: str
+    """Key used to uniquely identify the molecule."""
+    molecule: Molecule
+    """The molecule in JSON format."""
+    properties: "dict[str, Json]" = field(default_factory=dict)
+    """User-defined molecular properties."""
 
     @staticmethod
     def from_rdkit(
@@ -40,36 +52,16 @@ class Entry(dict):
         Returns:
             The entry.
         """
-        entry = Entry()
-        entry["key"] = key
-        entry["molecule"] = json.dumps(json_from_rdkit(molecule, properties))
-        return entry
-
-    @property
-    def key(self) -> str:
-        """The molecular key."""
-        return self["key"]
-
-    @property
-    def molecule(self) -> Molecule:
-        """The molecule."""
-        return json.loads(self["molecule"])
+        if properties is None:
+            properties = {}
+        return Entry(key, json_from_rdkit(molecule), properties)
 
 
-class PropertyEntry(dict):
-    """
-    A database entry for a property JSON dictionary.
-    """
-
-    @property
-    def key(self) -> str:
-        """The molecular key."""
-        return self["key"]
-
-    @property
-    def property(self) -> dict[str, Json]:
-        """The property dictionary."""
-        return self["property"]
+def _entry_to_sqlite(entry: Entry) -> dict:
+    d = asdict(entry)
+    d["molecule"] = json.dumps(d["molecule"])
+    d["properties"] = json.dumps(d["properties"])
+    return d
 
 
 class Database:
@@ -100,7 +92,9 @@ class Database:
         self.connection = sqlite3.connect(database)
         self.connection.execute(
             f"CREATE TABLE IF NOT EXISTS {molecule_table}("
-            "key TEXT PRIMARY KEY, molecule JSON)",
+            "key TEXT PRIMARY KEY NOT NULL, "
+            "molecule JSON NOT NULL, "
+            "properties JSON NOT NULL)",
         )
 
     def add_molecules(
@@ -118,8 +112,9 @@ class Database:
             molecules = (molecules,)
 
         self.connection.executemany(
-            f"INSERT INTO {self._molecule_table} VALUES (:key, :molecule)",
-            molecules,
+            f"INSERT INTO {self._molecule_table} "
+            "VALUES (:key, :molecule, :properties)",
+            map(_entry_to_sqlite, molecules),
         )
 
     def update_molecules(
@@ -146,7 +141,14 @@ class Database:
             molecules = (molecules,)
 
         if merge_properties:
-            raise NotImplementedError("")
+            # self.connection.executemany(
+            #     f"UPDATE {self._molecule_table} "
+            #     "SET molecule=json_set(molecule, '$.molecule', :molecule) "
+            #     "SET molecule=json_set(molecule, '$.properties', '{\"b\": 32}}') "
+            #     "WHERE key=:key",
+            #     ({"molecule": entry.molecule["molecule"], "properties": molecule["properties"], "key"} for entry in molecules),
+            # )
+            pass
         else:
             self.connection.executemany(
                 f"UPDATE {self._molecule_table} "
@@ -154,34 +156,12 @@ class Database:
                 molecules,
             )
 
-    def update_properties(
-        self,
-        properties: PropertyEntry | collections.abc.Iterable[PropertyEntry],
-        merge_properties: bool = True,
-    ) -> None:
-        """
-        Update properties of molecules in the database.
-
-        Parameters:
-            properties (PropertyEntry | list[PropertyEntry]):
-                The properties to update.
-            merge_properties:
-                If ``True``, the molecular properties dictionary
-                will not replace the existing one. Only fields
-                which a present in both the update and the
-                database will be replaced. If ``False``, the
-                property dictionary of the update will completely
-                replace any existing property dictionary in the
-                database.
-        """
-        raise NotImplementedError()
-
-    def get_molecules(
+    def get_entries(
         self,
         keys: str | collections.abc.Iterable[str],
     ) -> "DatabaseGetMolecules":
         """
-        Get molecules from the database.
+        Get molecular entries from the database.
 
         .. tip::
 
@@ -194,7 +174,6 @@ class Database:
             keys (str | list[str]):
                 The keys of the molecules to retrieve from the
                 database.
-
         Yields:
             The key and molecule. The molecule is in JSON format.
         """
@@ -203,10 +182,12 @@ class Database:
 
         keys = tuple(keys)
         query = ",".join("?" * len(keys))
-        yield from (
-            (key, json.loads(molecule_json_string))
-            for key, molecule_json_string in self.connection.execute(
-                f"SELECT * FROM {self._molecule_table} WHERE key IN ({query})",
-                keys,
+        for key, molecule, properties in self.connection.execute(
+            f"SELECT * FROM {self._molecule_table} WHERE key IN ({query})",
+            keys,
+        ):
+            yield Entry(
+                key=key,
+                molecule=json.loads(molecule),
+                properties=json.loads(properties),
             )
-        )

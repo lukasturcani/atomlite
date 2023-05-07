@@ -45,26 +45,17 @@ class Molecule(typing.TypedDict):
     """Dative bonds of the molecule."""
     aromatic_bonds: typing.NotRequired[AromaticBonds]
     """Aromatic bonds of the molecule."""
-    properties: "typing.NotRequired[dict[str, Json]]"
-    """User-supplied molecular properties."""
     conformers: typing.NotRequired[list[Conformer]]
     """Conformers of the molecule."""
 
 
-def json_from_rdkit(
-    molecule: rdkit.Mol,
-    properties: "dict[str, Json] | None" = None,
-) -> Molecule:
+def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
     """
     Create a JSON representation of an :mod:`rdkit` molecule.
 
     Parameters:
         molecule:
             The molecule to convert to JSON.
-        properties:
-            User-supplied properties to be added to the JSON
-            representation.
-
     Returns:
         A JSON molecule.
     """
@@ -130,8 +121,6 @@ def json_from_rdkit(
         d["dative_bonds"] = dative_bonds
     if aromatic_bonds:
         d["aromatic_bonds"] = aromatic_bonds
-    if properties is not None and properties:
-        d["properties"] = properties
     if molecule.GetNumConformers() > 0:
         d["conformers"] = [
             conformer.GetPositions().tolist()

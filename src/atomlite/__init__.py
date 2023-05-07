@@ -1,4 +1,4 @@
-from atomlite._internal.database import Database, Entry, PropertyEntry
+from atomlite._internal.database import Database, Entry
 from atomlite._internal.json import (
     AromaticBonds,
     Bonds,
@@ -18,7 +18,6 @@ __all__ = [
     "Properties",
     "Database",
     "Entry",
-    "PropertyEntry",
     "Json",
     "Molecule",
     "json_to_rdkit",
