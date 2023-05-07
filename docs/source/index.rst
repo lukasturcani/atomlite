@@ -60,7 +60,10 @@ I'm happy to help!
 Quickstart
 ----------
 
-First you create a database:
+Adding molecules to the database
+................................
+
+
 
 .. testsetup:: quickstart
 
@@ -70,36 +73,28 @@ First you create a database:
   temp_dir = tempfile.TemporaryDirectory()
   os.chdir(temp_dir.name)
 
+First you create a database:
 
 .. testcode:: quickstart
 
   import atomlite
   db = atomlite.Database("molecules.db")
 
-Then you add some molecules and their JSON properties it:
+Then you make some molecular entries:
 
 .. testcode:: quickstart
 
   import rdkit.Chem as rdkit
-  mol1 = atomlite.Entry.from_rdkit(
-      key="first",
-      molecule=rdkit.MolFromSmiles("C"),
-      properties={
-          "is_interesting": False,
-      },
-  )
-  mol2 = atomlite.Entry.from_rdkit(
-      key="second",
-      molecule=rdkit.MolFromSmiles("CN"),
-      properties={
-          "dict_prop": {
-            "array_prop": [0, 10, 20.5, "hi"],
-          },
-      },
-  )
+  mol1 = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+  mol2 = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("CN"))
+
+And add them to the database:
+
+.. testcode:: quickstart
+
   db.add_entries([mol1, mol2])
 
-And finally you can retrieve the molecules with their keys:
+Finally, you can retrieve the molecules with their keys:
 
 .. testcode:: quickstart
 
@@ -110,14 +105,24 @@ And finally you can retrieve the molecules with their keys:
 .. testoutput:: quickstart
   :hide:
 
-  {'is_interesting': False}
-  {'dict_prop': {'array_prop': [0, 10, 20.5, 'hi']}}
+  {}
+  {}
 
 
 .. testcleanup:: quickstart
 
   os.chdir(old_dir)
 
+
+
+Adding molecular properties
+............................
+
+Updating molecular properties
+.............................
+
+Removing molecular properties
+.............................
 
 
 Indices and tables
