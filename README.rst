@@ -33,8 +33,8 @@ Installation
 Quickstart
 ==========
 
-You can see a lot more examples in our docs__ but here is a taste of using
-AtomLite
+You can see a lot more examples in our docs_ but here is a taste of using
+AtomLite:
 
 .. code-block:: python
 
@@ -51,3 +51,6 @@ AtomLite
   for entry in db.get_entries(["first", "second"]):
     molecule = atomlite.json_to_rdkit(entry.molecule)
     print(entry.properties)
+
+
+.. _docs: https://atomlite.readthedocs.io
