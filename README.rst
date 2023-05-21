@@ -5,7 +5,7 @@
 AtomLite
 ========
 
-AtomLite is a Python library for simple molecular database on top of SQLite__. It's
+AtomLite is a Python library for simple molecular database on top of SQLite_. It's
 goals are as follows:
 
 #. Read and write molecules to SQLite easily.
@@ -17,7 +17,7 @@ In other words AtomLite should keep simple interactions with the database simple
 while keeping complex thing achievable.
 
 For an alternative to AtomLite, which provides stronger integration with RDKIT, and a
-greater focus on cheminformatics, see chemicalite__.
+greater focus on cheminformatics, see chemicalite_.
 
 .. _SQLite: https://docs.python.org/3/library/sqlite3.html
 .. _chemicalite: https://github.com/rvianello/chemicalite
