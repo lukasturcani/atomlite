@@ -1,5 +1,5 @@
-:author: Lukas Turcani
-:documentation: https://atomlite.readthedocs.io
+:Author: Lukas Turcani
+:Docs: https://atomlite.readthedocs.io
 
 ========
 AtomLite
