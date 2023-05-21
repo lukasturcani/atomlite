@@ -189,7 +189,7 @@ write our initial entry:
 
 .. testoutput:: updating_properties
 
-   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': False})
+  Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': False})
 
 We can change existing properties and add new ones:
 
@@ -205,7 +205,7 @@ We can change existing properties and add new ones:
 
 .. testoutput:: updating_properties
 
-   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': True, 'new': 20})
+  Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': True, 'new': 20})
 
 Or remove properties:
 
@@ -265,7 +265,7 @@ Let's write our initial entry:
 
 .. testoutput:: updating_entries
 
-   Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': False})
+  Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'is_interesting': False})
 
 
 We can change the molecule:
@@ -309,7 +309,7 @@ Or remove properties:
 
 .. testoutput:: updating_entries
 
-   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'new': 20})
+  Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'new': 20})
 
 .. testcleanup:: updating_entries
 
@@ -335,6 +335,93 @@ only keep it in memory, you can do that with:
   import atomlite
   db = atomlite.Database(":memory:")
 
+Running SQL commands
+....................
+
+Sometimes you want to alter the database by running some SQL commands
+directly, for that, you can use the :attr:`.Database.connection`:
+
+.. testsetup:: running_sql_commands
+
+  import tempfile
+  import os
+  old_dir = os.getcwd()
+  temp_dir = tempfile.TemporaryDirectory()
+  os.chdir(temp_dir.name)
+
+
+.. testcode:: running_sql_commands
+
+  import atomlite
+  import rdkit.Chem as rdkit
+  db = atomlite.Database("molecules.db")
+  entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("Br"), {"new": 20})
+  db.add_entries(entry)
+  for row in db.connection.execute("SELECT * FROM molecules"):
+      print(row)
+
+.. testoutput:: running_sql_commands
+
+  ('first', '{"atomic_numbers": [35]}', '{"new": 20}')
+
+.. testcleanup:: running_sql_commands
+
+  os.chdir(old_dir)
+
+Usage with Python versions before 3.11
+......................................
+
+Sometimes you have an :mod:`atomlite` database but you can't use :mod:`atomlite`
+because it requires Python 3.11, while the project you're trying to use your
+database with is stuck at an ealier Python version.
+
+Fortunately, we can still interact with the database, for example here we can
+add additional properties to a molecule using just :mod:`sqlite3`:
+
+.. testsetup:: sqlite3_usage
+
+  import tempfile
+  import os
+  old_dir = os.getcwd()
+  temp_dir = tempfile.TemporaryDirectory()
+  os.chdir(temp_dir.name)
+
+  import atomlite
+  import rdkit.Chem as rdkit
+  db = atomlite.Database("molecules.db")
+  entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("Br"))
+  db.add_entries(entry)
+
+.. testcode:: sqlite3_usage
+
+  import sqlite3
+  import json
+  db = sqlite3.connect("molecules.db")
+  db.execute(
+      "UPDATE molecules "
+      "SET properties=json_patch(properties,?) "
+      "WHERE key=?",
+      (json.dumps({"new": 20}), "first"),
+  )
+  db.commit()
+
+
+We can check that the updates are recognized when using :mod:`atomlite`:
+
+.. testcode:: sqlite3_usage
+
+  import atomlite
+  db = atomlite.Database("molecules.db")
+  for entry in db.get_entries():
+      print(entry)
+
+.. testoutput:: sqlite3_usage
+
+  Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'new': 20})
+
+.. testcleanup:: sqlite3_usage
+
+  os.chdir(old_dir)
 
 Indices and tables
 ==================
