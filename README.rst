@@ -1,9 +1,9 @@
-:Author: Lukas Turcani
-:Docs: https://atomlite.readthedocs.io
-
 ========
 AtomLite
 ========
+
+:Author: Lukas Turcani
+:Docs: https://atomlite.readthedocs.io
 
 AtomLite is a Python library for simple molecular database on top of SQLite_.
 
