@@ -122,6 +122,7 @@ class Database:
     def add_entries(
         self,
         entries: Entry | collections.abc.Iterable[Entry],
+        commit: bool = True,
     ) -> None:
         """
         Add molecular entries to the database.
@@ -129,6 +130,9 @@ class Database:
         Parameters:
             entries (Entry | list[Entry]):
                 The molecules to add to the database.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
         """
         if isinstance(entries, Entry):
             entries = (entries,)
@@ -138,11 +142,14 @@ class Database:
             "VALUES (:key, :molecule, :properties)",
             map(_entry_to_sqlite, entries),
         )
+        if commit:
+            self.connection.commit()
 
     def update_entries(
         self,
         entries: Entry | collections.abc.Iterable[Entry],
         merge_properties: bool = True,
+        commit: bool = True,
     ) -> None:
         """
         Update molecules in the database.
@@ -155,6 +162,9 @@ class Database:
                 merged rather than replaced. Properties present
                 in both the update and the database will be
                 overwritten.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
         """
         if isinstance(entries, Entry):
             entries = (entries,)
@@ -174,6 +184,8 @@ class Database:
                 "WHERE key=:key",
                 map(_entry_to_sqlite, entries),
             )
+        if commit:
+            self.connection.commit()
 
     def get_entries(
         self,
@@ -227,6 +239,7 @@ class Database:
         self,
         entries: PropertyEntry | collections.abc.Iterable[PropertyEntry],
         merge_properties: bool = True,
+        commit: bool = True,
     ) -> None:
         """
         Update molecular properties.
@@ -239,6 +252,9 @@ class Database:
                 merged rather than replaced. Properties present
                 in both the update and the database will be
                 overwritten.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
         """
         if isinstance(entries, PropertyEntry):
             entries = (entries,)
@@ -257,3 +273,5 @@ class Database:
                 "WHERE key=:key",
                 map(_property_entry_to_sqlite, entries),
             )
+        if commit:
+            self.connection.commit()
