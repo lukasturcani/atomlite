@@ -26,7 +26,7 @@ greater focus on cheminformatics, see chemicalite_.
 Installation
 ============
 
-.. code-block: bash
+.. code-block:: bash
 
   pip install atomlite
 
