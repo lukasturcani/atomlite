@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -39,6 +39,9 @@ documentation = "https://atomlite.readthedocs.io"
 atomlite = [
   "py.typed",
 ]
+
+[tool.setuptools_scm]
+fallback_version = "0.0.0"
 
 [tool.ruff]
 line-length = 79
