@@ -51,3 +51,8 @@ enter-docker:
   docker run -it --rm \
     --mount type=bind,source="$(pwd)",target=/code \
     atomlite-testing-environment:latest /bin/sh
+
+
+# Build a release
+build:
+  python -m build
