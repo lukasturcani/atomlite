@@ -20,6 +20,7 @@ jobs:
       - name: Build atomlite
         run: |
           . /deps/venv/bin/activate
+          git tag
           python -m build
       - name: Publish atomlite
         run: >
