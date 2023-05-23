@@ -10,7 +10,7 @@ import rdkit.Chem as rdkit
 from atomlite._internal.json import Json, Molecule, json_from_rdkit
 
 Properties: typing.TypeAlias = dict[str, Json] | None
-DatabaseGetMolecules: typing.TypeAlias = collections.abc.Iterator["Entry"]
+DatabaseGetEntries: typing.TypeAlias = collections.abc.Iterator["Entry"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -190,7 +190,7 @@ class Database:
     def get_entries(
         self,
         keys: str | collections.abc.Iterable[str] | None = None,
-    ) -> "DatabaseGetMolecules":
+    ) -> "DatabaseGetEntries":
         """
         Get molecular entries from the database.
 
