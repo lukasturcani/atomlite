@@ -28,7 +28,6 @@ autodoc_typehints = "description"
 autodoc_member_order = "groupwise"
 autoclass_content = "both"
 autodoc_type_aliases = {
-    "DatabaseGetEntries": "collections.abc.Iterator[tuple[str, Entry]]",
     "Properties": "dict[str, Json]",
     "Json": "Json",
 }
