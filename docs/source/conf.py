@@ -28,7 +28,7 @@ autodoc_typehints = "description"
 autodoc_member_order = "groupwise"
 autoclass_content = "both"
 autodoc_type_aliases = {
-    "DatabaseGetMolecules": "collections.abc.Iterator[tuple[str, Molecule]]",
+    "DatabaseGetEntries": "collections.abc.Iterator[tuple[str, Entry]]",
     "Properties": "dict[str, Json]",
     "Json": "Json",
 }
