@@ -245,7 +245,7 @@ class Database:
         Update molecular properties.
 
         Parameters:
-            entries (Entry | list[Entry]):
+            entries (PropertyEntry | list[PropertyEntry]):
                 The entries to update in the database.
             merge_properties:
                 If ``True``, the molecular properties will be
