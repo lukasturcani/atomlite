@@ -121,14 +121,8 @@ Adding molecular properties
 
 .. testsetup:: adding_properties
 
-  import tempfile
-  import os
-  old_dir = os.getcwd()
-  temp_dir = tempfile.TemporaryDirectory()
-  os.chdir(temp_dir.name)
-
   import atomlite
-  db = atomlite.Database("molecules.db")
+  db = atomlite.Database(":memory:")
   import rdkit.Chem as rdkit
 
 We can add JSON properties to our molecular entries:
@@ -153,23 +147,13 @@ And retrieve them:
 
   {'is_interesting': False}
 
-.. testcleanup:: adding_properties
-
-  os.chdir(old_dir)
-
 Updating molecular properties
 .............................
 
 .. testsetup:: updating_properties
 
-  import tempfile
-  import os
-  old_dir = os.getcwd()
-  temp_dir = tempfile.TemporaryDirectory()
-  os.chdir(temp_dir.name)
-
   import atomlite
-  db = atomlite.Database("molecules.db")
+  db = atomlite.Database(":memory:")
   import rdkit.Chem as rdkit
 
 If we want to update molecular properties, we can use
@@ -220,10 +204,6 @@ Or remove properties:
 
    Entry(key='first', molecule={'atomic_numbers': [6]}, properties={'new': 20})
 
-.. testcleanup:: updating_properties
-
-  os.chdir(old_dir)
-
 .. note::
 
    The parameter ``merge_properties=False`` causes the entire property dictionary to
@@ -239,15 +219,9 @@ Updating entries
 
 .. testsetup:: updating_entries
 
-  import tempfile
-  import os
-  old_dir = os.getcwd()
-  temp_dir = tempfile.TemporaryDirectory()
-  os.chdir(temp_dir.name)
-
   import atomlite
-  db = atomlite.Database("molecules.db")
   import rdkit.Chem as rdkit
+  db = atomlite.Database(":memory:")
 
 We can update whole molecular entries in the database.
 Let's write our initial entry:
@@ -311,10 +285,6 @@ Or remove properties:
 
   Entry(key='first', molecule={'atomic_numbers': [35]}, properties={'new': 20})
 
-.. testcleanup:: updating_entries
-
-  os.chdir(old_dir)
-
 .. note::
 
    The parameter ``merge_properties=False`` causes the entire property dictionary to
@@ -323,6 +293,87 @@ Or remove properties:
 .. seealso::
 
   * :meth:`.Database.update_entries`: For additional documentaiton.
+
+Checking if a value exists in the database
+..........................................
+
+Sometimes you want to use a database as a cache to avoid recomputations.
+There is a simple way to do this!
+
+.. testsetup:: check_value_present
+
+  import atomlite
+  import rdkit.Chem as rdkit
+  db = atomlite.Database(":memory:")
+  db.add_entries(
+      entries=atomlite.Entry.from_rdkit(
+          key="first",
+          molecule=rdkit.MolFromSmiles("C"),
+      ),
+  )
+
+.. testcode:: check_value_present
+
+  molecule = rdkit.MolFromSmiles("CCC")
+  num_atoms = db.get_property("first", "$.physical.num_atoms")
+  if num_atoms is None:
+      num_atoms = molecule.GetNumAtoms()
+      db.set_property("first", "$.physical.num_atoms", num_atoms)
+  print(num_atoms)
+
+.. testoutput:: check_value_present
+
+  3
+
+.. _examples-valid-property-paths:
+
+Valid property paths
+....................
+
+Given a property dictionary:
+
+.. testcode:: valid_property_paths
+
+  properties = {
+      "a": {
+          "b": [1, 2, 3],
+          "c": 12,
+      },
+  }
+
+.. testcode:: valid_property_paths
+  :hide:
+
+  import atomlite
+  import rdkit.Chem as rdkit
+  db = atomlite.Database(":memory:")
+  db.add_entries(
+      entries=atomlite.Entry.from_rdkit(
+          key="first",
+          molecule=rdkit.MolFromSmiles("C"),
+          properties=properties,
+      ),
+  )
+
+we can access the various properties with the following paths:
+
+.. doctest:: valid_property_paths
+
+  >>> db.get_property("first", "$.a")
+  {'b': [1, 2, 3], 'c': 12}
+  >>> db.get_property("first", "$.a.b")
+  [1, 2, 3]
+  >>> db.get_property("first", "$.a.b[1]")
+  2
+  >>> db.get_property("first", "$.a.c")
+  12
+  >>> db.get_property("first", "$.a.does_not_exist") is None
+  True
+
+A full description of the syntax is provided here_.
+
+.. _here: https://www.sqlite.org/json1.html#path_arguments
+
 
 Using an in-memory database
 ...........................

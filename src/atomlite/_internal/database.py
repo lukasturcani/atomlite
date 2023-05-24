@@ -85,6 +85,14 @@ def _property_entry_to_sqlite(entry: PropertyEntry) -> dict:
     return d
 
 
+class MoleculeNotFound(Exception):
+    """
+    Raised when a molecule is not found in the database.
+    """
+
+    pass
+
+
 class Database:
     """
     A molecular SQLite database.
@@ -207,7 +215,6 @@ class Database:
         Yields:
             A molecular entry matching `keys`.
         """
-
         if keys is None:
             for key, molecule, properties in self.connection.execute(
                 f"SELECT * FROM {self._molecule_table}",
@@ -233,6 +240,97 @@ class Database:
                 molecule=json.loads(molecule),
                 properties=json.loads(properties),
             )
+
+    def get_property(
+        self,
+        key: str,
+        path: str,
+    ) -> "Json":
+        """
+        Get the property of a molecule.
+
+        .. note::
+
+            If `path` does not lead to a property which exists,
+            ``None`` will be returned. This means that the same
+            value is returned for a missing value as well as an
+            exisiting value set to ``None``. If you need to
+            distinguish between missing and ``None`` values you
+            can use a different value to represent missing data,
+            for example the string ``"MISSING"``.
+
+        Parameters:
+            key: The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+        Returns:
+            The property.
+        Raises:
+            MoleculeNotFound:
+                If the molecule is not found in the database.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        result = self.connection.execute(
+            "SELECT json_extract(properties,?), "
+            "json_type(properties,?) "
+            f"FROM {self._molecule_table} "
+            "WHERE key=?",
+            (path, path, key),
+        ).fetchone()
+        if result is None:
+            raise MoleculeNotFound(
+                "Can't get property of a molecule not in the database."
+            )
+        property, property_type = result
+        if property_type == "object" or property_type == "array":
+            return json.loads(property)
+        elif property_type == "true" or property_type == "false":
+            return bool(property)
+        else:
+            return property
+
+    def set_property(
+        self,
+        key: str,
+        path: str,
+        property: float | str | bool | None,
+        commit: bool = True,
+    ) -> None:
+        """
+        Set the property of molecule.
+
+        .. note::
+
+            If `key` does not exist in the database, this function
+            will finish successfully but it will not change the database.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            property:
+                The desired value of the property.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+        """
+        self.connection.execute(
+            f"UPDATE {self._molecule_table} "
+            "SET properties=json_set(properties,?,?) "
+            "WHERE key=?",
+            (path, property, key),
+        )
+
+        if commit:
+            self.connection.commit()
 
     def update_properties(
         self,

@@ -19,6 +19,72 @@ class MultipleEntryCase:
     molecules: tuple[rdkit.Mol, ...]
 
 
+def test_set_property(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("C"),
+        properties={
+            "a": {
+                "b": 12,
+            },
+        },
+    )
+    database.add_entries(entry)
+    database.set_property("first", "$.a.c", 12)
+    assert database.get_property("first", "$.a.c") == 12
+
+
+def test_get_missing_property(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("C"),
+        properties={
+            "a": {
+                "b": 12,
+            },
+        },
+    )
+    database.add_entries(entry)
+    assert database.get_property("first", "$.a.not_here") is None
+
+
+def test_get_property_from_missing_molecule(
+    database: atomlite.Database,
+) -> None:
+    with pytest.raises(atomlite.MoleculeNotFound):
+        database.get_property("first", "$.a.a")
+
+
+def test_get_property(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("C"),
+        properties={
+            "a": {
+                "b": 12,
+                "c": [1, 2, 3],
+                "d": "[4, 5, 6]",
+                "e": "hi",
+                "f": None,
+                "g": {"a": 12, "b": 24},
+                "h": True,
+                "i": False,
+                "j": 12.2,
+            },
+        },
+    )
+    database.add_entries(entry)
+    assert database.get_property("first", "$.a.b") == 12
+    assert database.get_property("first", "$.a.c") == [1, 2, 3]
+    assert database.get_property("first", "$.a.d") == "[4, 5, 6]"
+    assert database.get_property("first", "$.a.e") == "hi"
+    assert database.get_property("first", "$.a.f") is None
+    assert database.get_property("first", "$.a.g") == {"a": 12, "b": 24}
+    assert database.get_property("first", "$.a.h") is True
+    assert database.get_property("first", "$.a.i") is False
+    assert database.get_property("first", "$.a.j") == 12.2
+
+
 def test_entry_is_replaced_on_update(database: atomlite.Database) -> None:
     entry1 = atomlite.Entry.from_rdkit(
         key="first",
