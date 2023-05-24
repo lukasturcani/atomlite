@@ -86,6 +86,10 @@ def _property_entry_to_sqlite(entry: PropertyEntry) -> dict:
 
 
 class MoleculeNotFound(Exception):
+    """
+    Raised when a molecule is not found in the database.
+    """
+
     pass
 
 
@@ -268,17 +272,13 @@ class Database:
             MoleculeNotFound:
                 If the molecule is not found in the database.
 
-
         .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
-
         result = self.connection.execute(
-            (
-                "SELECT json_extract(properties,?), "
-                "json_type(properties,?) "
-                f"FROM {self._molecule_table} "
-                "WHERE key=?"
-            ),
+            "SELECT json_extract(properties,?), "
+            "json_type(properties,?) "
+            f"FROM {self._molecule_table} "
+            "WHERE key=?",
             (path, path, key),
         ).fetchone()
         if result is None:
@@ -297,9 +297,38 @@ class Database:
         self,
         key: str,
         path: str,
-        property: Json,
+        property: float | str | bool | None,
         commit: bool = True,
     ) -> None:
+        """
+        Set the property of molecule.
+
+        .. note::
+
+            If `key` does not exist in the database, this function
+            will finish successfully but it will not change the database.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            property:
+                The desired value of the property.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+        """
+        self.connection.execute(
+            f"UPDATE {self._molecule_table} "
+            "SET properties=json_set(properties,?,?) "
+            "WHERE key=?",
+            (path, property, key),
+        )
+
         if commit:
             self.connection.commit()
 
