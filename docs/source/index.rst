@@ -116,6 +116,15 @@ Finally, you can retrieve the molecules with their keys:
 
   os.chdir(old_dir)
 
+
+.. seealso::
+
+  * :class:`.Database`: For additional documentation.
+  * :meth:`.Database.add_entries`: For additional documentation.
+  * :meth:`.Database.get_entries`: For additional documentation.
+  * :meth:`.Entry.from_rdkit`: For additional documentation.
+  * :func:`.json_to_rdkit`: For additional documentation.
+
 Adding molecular properties
 ............................
 
@@ -146,6 +155,12 @@ And retrieve them:
 .. testoutput:: adding_properties
 
   {'is_interesting': False}
+
+.. seealso::
+
+  * :meth:`.Database.add_entries`: For additional documentation.
+  * :meth:`.Database.get_entries`: For additional documentation.
+  * :meth:`.Entry.from_rdkit`: For additional documentation.
 
 Updating molecular properties
 .............................
@@ -211,8 +226,11 @@ Or remove properties:
 
 .. seealso::
 
+  * :meth:`.Database.add_entries`: For additional documentation.
+  * :meth:`.Database.get_entries`: For additional documentation.
   * :meth:`.Database.update_properties`: For additional documentaiton.
-
+  * :meth:`.Entry.from_rdkit`: For additional documentation.
+  * :class:`.PropertyEntry`: For additional documentation.
 
 Updating entries
 ................
@@ -292,7 +310,10 @@ Or remove properties:
 
 .. seealso::
 
+  * :meth:`.Database.add_entries`: For additional documentation.
+  * :meth:`.Database.get_entries`: For additional documentation.
   * :meth:`.Database.update_entries`: For additional documentaiton.
+  * :meth:`.Entry.from_rdkit`: For additional documentation.
 
 Checking if a value exists in the database
 ..........................................
@@ -324,6 +345,11 @@ There is a simple way to do this!
 .. testoutput:: check_value_present
 
   3
+
+.. seealso::
+
+  * :meth:`.Database.get_property`: For additional documentation.
+  * :meth:`.Database.set_property`: For additional documentation.
 
 .. _examples-valid-property-paths:
 
@@ -374,6 +400,9 @@ A full description of the syntax is provided here_.
 
 .. _here: https://www.sqlite.org/json1.html#path_arguments
 
+.. seealso::
+
+  * :meth:`.Database.get_property`: For additional documentation.
 
 Using an in-memory database
 ...........................

@@ -6,7 +6,7 @@
    :members:
 
    {% block methods %}
-   {% if methods and objname != 'Molecule' %}
+   {% if methods %}
    .. rubric:: {{ _('Methods') }}
 
    .. autosummary::
