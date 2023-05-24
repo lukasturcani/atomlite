@@ -367,8 +367,8 @@ we can access the various properties with the following paths:
   2
   >>> db.get_property("first", "$.a.c")
   12
-  >>> print(db.get_property("first", "$.a.does_not_exist"))
-  None
+  >>> db.get_property("first", "$.a.does_not_exist") is None
+  True
 
 A full description of the syntax is provided here_.
 
