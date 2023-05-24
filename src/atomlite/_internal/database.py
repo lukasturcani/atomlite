@@ -264,24 +264,28 @@ class Database:
                 in our docs.
         Returns:
             The property.
+        Raises:
+            MoleculeNotFound:
+                If the molecule is not found in the database.
+
 
         .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
 
-        try:
-            property, property_type = self.connection.execute(
-                (
-                    "SELECT json_extract(properties,?), "
-                    "json_type(properties,?) "
-                    f"FROM {self._molecule_table} "
-                    "WHERE key=?"
-                ),
-                (path, path, key),
-            ).fetchone()
-        except TypeError:
+        result = self.connection.execute(
+            (
+                "SELECT json_extract(properties,?), "
+                "json_type(properties,?) "
+                f"FROM {self._molecule_table} "
+                "WHERE key=?"
+            ),
+            (path, path, key),
+        ).fetchone()
+        if result is None:
             raise MoleculeNotFound(
                 "Can't get property of a molecule not in the database."
-            ) from None
+            )
+        property, property_type = result
         if property_type == "object" or property_type == "array":
             return json.loads(property)
         elif property_type == "true" or property_type == "false":
