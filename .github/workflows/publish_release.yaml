@@ -6,25 +6,17 @@ on:
 jobs:
   publish-release:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/lukasturcani/atomlite-testing-environment:latest
     env:
       VERSION: ${{ github.ref_name }}
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-      - name: Install atomlite
-        run: |
-          . /deps/venv/bin/activate
-          pip install --no-deps -e .
-      - name: Build atomlite
-        run: |
-          . /deps/venv/bin/activate
-          python -m build
-      - name: Publish atomlite
-        run: >
-          . /deps/venv/bin/activate
-
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -e '.[dev]'
+      - run: python -m build
+      - run:
           twine upload
           -u ${{ secrets.PYPI_USERNAME }}
           -p ${{ secrets.PYPI_PASSWORD }}
