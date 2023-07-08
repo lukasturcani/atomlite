@@ -56,7 +56,7 @@ class Entry:
         return Entry(key, json_from_rdkit(molecule), properties)
 
 
-def _entry_to_sqlite(entry: Entry) -> dict:
+def _entry_to_sqlite(entry: Entry) -> dict[str, Json]:
     d = asdict(entry)
     d["molecule"] = json.dumps(d["molecule"])
     d["properties"] = json.dumps(d["properties"])
@@ -79,7 +79,7 @@ class PropertyEntry:
     """User-defined molecular properties."""
 
 
-def _property_entry_to_sqlite(entry: PropertyEntry) -> dict:
+def _property_entry_to_sqlite(entry: PropertyEntry) -> dict[str, Json]:
     d = asdict(entry)
     d["properties"] = json.dumps(d["properties"])
     return d
