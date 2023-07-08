@@ -61,6 +61,7 @@ disallow_incomplete_defs = true
 check_untyped_defs = true
 disallow_untyped_decorators = true
 warn_unreachable = true
+disallow_any_generics = true
 
 [[tool.mypy.overrides]]
 module = [

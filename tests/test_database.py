@@ -240,8 +240,8 @@ def _assert_atom_numbers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
 
 
 def _assert_properties_match(
-    expected: dict | None,
-    actual: dict | None,
+    expected: dict[str, atomlite.Json] | None,
+    actual: dict[str, atomlite.Json] | None,
 ) -> None:
     assert json.dumps(expected) == json.dumps(actual)
 
