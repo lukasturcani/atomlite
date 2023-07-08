@@ -3,7 +3,7 @@ import typing
 import rdkit.Chem as rdkit
 
 Json: typing.TypeAlias = (
-    bool | int | float | str | None | list["Json"] | dict[str, "Json"]
+    bool | float | str | None | list["Json"] | dict[str, "Json"]
 )
 Conformer: typing.TypeAlias = list[list[float]]
 
