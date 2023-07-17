@@ -242,7 +242,8 @@ class Database:
         """
         if keys is None:
             for key, molecule, properties in self.connection.execute(
-                f"SELECT * FROM {self._molecule_table} WHERE molecule IS NOT NULL",
+                f"SELECT * FROM {self._molecule_table} "
+                "WHERE molecule IS NOT NULL",
             ):
                 yield Entry(
                     key=key,
