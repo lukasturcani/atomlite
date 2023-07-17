@@ -125,6 +125,45 @@ def test_properties_get_merged_on_entry_update(
     assert entry.properties == {"a": 12, "b": 32}
 
 
+def test_upsert(
+    database: atomlite.Database,
+) -> None:
+    entry1 = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("C"),
+        properties={"a": 12, "b": 10},
+    )
+    database.update_entries(entry1, upsert=False)
+    assert len(list(database.get_entries("first"))) == 0
+    database.update_entries(entry1, upsert=True)
+    (result1,) = list(database.get_entries("first"))
+    molecule1 = atomlite.json_to_rdkit(result1.molecule)
+    assert molecule1.GetNumAtoms() == 1
+    assert result1.properties == {"a": 12, "b": 10}
+
+    entry2 = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("CC"),
+        properties={"b": 32},
+    )
+    database.update_entries(entry2, merge_properties=True, upsert=True)
+    (result2,) = list(database.get_entries("first"))
+    molecule2 = atomlite.json_to_rdkit(result2.molecule)
+    assert molecule2.GetNumAtoms() == 2
+    assert result2.properties == {"a": 12, "b": 32}
+
+    entry3 = atomlite.Entry.from_rdkit(
+        key="first",
+        molecule=rdkit.MolFromSmiles("CCC"),
+        properties={"b": 64},
+    )
+    database.update_entries(entry3, merge_properties=False, upsert=True)
+    (result3,) = list(database.get_entries("first"))
+    molecule3 = atomlite.json_to_rdkit(result3.molecule)
+    assert molecule3.GetNumAtoms() == 3
+    assert result3.properties == {"b": 64}
+
+
 def test_properties_get_merged_on_property_update(
     database: atomlite.Database,
 ) -> None:

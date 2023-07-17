@@ -180,21 +180,42 @@ class Database:
         if isinstance(entries, Entry):
             entries = (entries,)
 
-        if merge_properties:
-            self.connection.executemany(
-                f"UPDATE {self._molecule_table} "
-                "SET molecule=:molecule, "
-                "properties=json_patch(properties,:properties) "
-                "WHERE key=:key",
-                map(_entry_to_sqlite, entries),
-            )
+        if upsert:
+            if merge_properties:
+                self.connection.executemany(
+                    f"INSERT INTO {self._molecule_table} "
+                    "VALUES (:key, :molecule, :properties) "
+                    "ON CONFLICT(key) DO UPDATE "
+                    "SET molecule=:molecule, "
+                    "properties=json_patch(properties,:properties) "
+                    "WHERE key=:key",
+                    map(_entry_to_sqlite, entries),
+                )
+            else:
+                self.connection.executemany(
+                    f"INSERT INTO {self._molecule_table} "
+                    "VALUES (:key, :molecule, :properties) "
+                    "ON CONFLICT(key) DO UPDATE "
+                    "SET molecule=:molecule, properties=:properties "
+                    "WHERE key=:key",
+                    map(_entry_to_sqlite, entries),
+                )
         else:
-            self.connection.executemany(
-                f"UPDATE {self._molecule_table} "
-                "SET molecule=:molecule, properties=:properties "
-                "WHERE key=:key",
-                map(_entry_to_sqlite, entries),
-            )
+            if merge_properties:
+                self.connection.executemany(
+                    f"UPDATE {self._molecule_table} "
+                    "SET molecule=:molecule, "
+                    "properties=json_patch(properties,:properties) "
+                    "WHERE key=:key",
+                    map(_entry_to_sqlite, entries),
+                )
+            else:
+                self.connection.executemany(
+                    f"UPDATE {self._molecule_table} "
+                    "SET molecule=:molecule, properties=:properties "
+                    "WHERE key=:key",
+                    map(_entry_to_sqlite, entries),
+                )
         if commit:
             self.connection.commit()
 
