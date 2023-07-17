@@ -32,6 +32,10 @@ def test_set_property(database: atomlite.Database) -> None:
     database.add_entries(entry)
     database.set_property("first", "$.a.c", 12)
     assert database.get_property("first", "$.a.c") == 12
+    database.set_property("second", "$.d.e", "hi")
+    assert database.get_property("second", "$.d.e") == "hi"
+    (entry,) = database.get_entries()
+    assert entry.key == "first"
 
 
 def test_get_missing_property(database: atomlite.Database) -> None:

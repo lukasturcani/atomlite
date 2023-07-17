@@ -122,7 +122,7 @@ class Database:
         self.connection.execute(
             f"CREATE TABLE IF NOT EXISTS {molecule_table}("
             "key TEXT PRIMARY KEY NOT NULL, "
-            "molecule JSON NOT NULL, "
+            "molecule JSON, "
             "properties JSON NOT NULL)",
         )
 
@@ -242,7 +242,8 @@ class Database:
         """
         if keys is None:
             for key, molecule, properties in self.connection.execute(
-                f"SELECT * FROM {self._molecule_table}",
+                f"SELECT * FROM {self._molecule_table} "
+                "WHERE molecule IS NOT NULL",
             ):
                 yield Entry(
                     key=key,
@@ -266,11 +267,7 @@ class Database:
                 properties=json.loads(properties),
             )
 
-    def get_property(
-        self,
-        key: str,
-        path: str,
-    ) -> "Json":
+    def get_property(self, key: str, path: str) -> "Json":
         """
         Get the property of a molecule.
 
@@ -328,11 +325,6 @@ class Database:
         """
         Set the property of molecule.
 
-        .. note::
-
-            If `key` does not exist in the database, this function
-            will finish successfully but it will not change the database.
-
         Parameters:
             key:
                 The key of the molecule.
@@ -346,14 +338,17 @@ class Database:
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         self.connection.execute(
-            f"UPDATE {self._molecule_table} "
-            "SET properties=json_set(properties,?,?) "
-            "WHERE key=?",
-            (path, property, key),
+            f"INSERT INTO {self._molecule_table} (key,properties)"
+            "VALUES (:key,json_set('{}',:path,:property)) "
+            "ON CONFLICT(key) DO UPDATE "
+            "SET properties=json_set(properties,:path,:property) "
+            "WHERE key=:key",
+            {"key": key, "path": path, "property": property},
         )
-
         if commit:
             self.connection.commit()
 
