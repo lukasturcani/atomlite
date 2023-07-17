@@ -85,14 +85,6 @@ def _property_entry_to_sqlite(entry: PropertyEntry) -> dict[str, Json]:
     return d
 
 
-class MoleculeNotFound(Exception):
-    """
-    Raised when a molecule is not found in the database.
-    """
-
-    pass
-
-
 class Database:
     """
     A molecular SQLite database.
@@ -282,17 +274,17 @@ class Database:
             for example the string ``"MISSING"``.
 
         Parameters:
-            key: The key of the molecule.
+            key:
+                The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
                 paths are described here_. You can also view various
                 code :ref:`examples<examples-valid-property-paths>`
                 in our docs.
         Returns:
-            The property.
-        Raises:
-            MoleculeNotFound:
-                If the molecule is not found in the database.
+            The property. ``None`` will be returned if `key`
+            is not present in the database or `path` leads to
+            a non-existent property.
 
         .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
@@ -304,9 +296,7 @@ class Database:
             (path, path, key),
         ).fetchone()
         if result is None:
-            raise MoleculeNotFound(
-                "Can't get property of a molecule not in the database."
-            )
+            return None
         property, property_type = result
         if property_type == "object" or property_type == "array":
             return json.loads(property)

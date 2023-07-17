@@ -1,7 +1,6 @@
 from atomlite._internal.database import (
     Database,
     Entry,
-    MoleculeNotFound,
     PropertyEntry,
 )
 from atomlite._internal.json import (
@@ -22,7 +21,6 @@ __all__ = [
     "AromaticBonds",
     "Database",
     "Entry",
-    "MoleculeNotFound",
     "PropertyEntry",
     "Json",
     "Molecule",

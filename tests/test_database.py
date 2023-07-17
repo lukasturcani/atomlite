@@ -55,8 +55,7 @@ def test_get_missing_property(database: atomlite.Database) -> None:
 def test_get_property_from_missing_molecule(
     database: atomlite.Database,
 ) -> None:
-    with pytest.raises(atomlite.MoleculeNotFound):
-        database.get_property("first", "$.a.a")
+    assert database.get_property("first", "$.a.a") is None
 
 
 def test_get_property(database: atomlite.Database) -> None:
