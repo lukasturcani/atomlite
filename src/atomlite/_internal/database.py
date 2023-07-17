@@ -156,6 +156,7 @@ class Database:
         self,
         entries: Entry | collections.abc.Iterable[Entry],
         merge_properties: bool = True,
+        upsert: bool = True,
         commit: bool = True,
     ) -> None:
         """
@@ -169,6 +170,9 @@ class Database:
                 merged rather than replaced. Properties present
                 in both the update and the database will be
                 overwritten.
+            upsert:
+                If ``True``, entries will be added to the
+                database if missing.
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.
@@ -176,21 +180,42 @@ class Database:
         if isinstance(entries, Entry):
             entries = (entries,)
 
-        if merge_properties:
-            self.connection.executemany(
-                f"UPDATE {self._molecule_table} "
-                "SET molecule=:molecule, "
-                "properties=json_patch(properties,:properties) "
-                "WHERE key=:key",
-                map(_entry_to_sqlite, entries),
-            )
+        if upsert:
+            if merge_properties:
+                self.connection.executemany(
+                    f"INSERT INTO {self._molecule_table} "
+                    "VALUES (:key, :molecule, :properties) "
+                    "ON CONFLICT(key) DO UPDATE "
+                    "SET molecule=:molecule, "
+                    "properties=json_patch(properties,:properties) "
+                    "WHERE key=:key",
+                    map(_entry_to_sqlite, entries),
+                )
+            else:
+                self.connection.executemany(
+                    f"INSERT INTO {self._molecule_table} "
+                    "VALUES (:key, :molecule, :properties) "
+                    "ON CONFLICT(key) DO UPDATE "
+                    "SET molecule=:molecule, properties=:properties "
+                    "WHERE key=:key",
+                    map(_entry_to_sqlite, entries),
+                )
         else:
-            self.connection.executemany(
-                f"UPDATE {self._molecule_table} "
-                "SET molecule=:molecule, properties=:properties "
-                "WHERE key=:key",
-                map(_entry_to_sqlite, entries),
-            )
+            if merge_properties:
+                self.connection.executemany(
+                    f"UPDATE {self._molecule_table} "
+                    "SET molecule=:molecule, "
+                    "properties=json_patch(properties,:properties) "
+                    "WHERE key=:key",
+                    map(_entry_to_sqlite, entries),
+                )
+            else:
+                self.connection.executemany(
+                    f"UPDATE {self._molecule_table} "
+                    "SET molecule=:molecule, properties=:properties "
+                    "WHERE key=:key",
+                    map(_entry_to_sqlite, entries),
+                )
         if commit:
             self.connection.commit()
 
