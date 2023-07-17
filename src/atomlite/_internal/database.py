@@ -156,6 +156,7 @@ class Database:
         self,
         entries: Entry | collections.abc.Iterable[Entry],
         merge_properties: bool = True,
+        upsert: bool = True,
         commit: bool = True,
     ) -> None:
         """
@@ -169,6 +170,9 @@ class Database:
                 merged rather than replaced. Properties present
                 in both the update and the database will be
                 overwritten.
+            upsert:
+                If ``True``, entries will be added to the
+                database if missing.
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.

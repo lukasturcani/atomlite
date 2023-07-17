@@ -97,7 +97,7 @@ def test_entry_is_replaced_on_update(database: atomlite.Database) -> None:
         molecule=rdkit.MolFromSmiles("CC"),
         properties={"b": 32},
     )
-    database.update_entries(entry2, merge_properties=False)
+    database.update_entries(entry2, merge_properties=False, upsert=False)
     entry = next(database.get_entries("first"))
     molecule = atomlite.json_to_rdkit(entry.molecule)
     assert molecule.GetNumAtoms() == 2
@@ -118,7 +118,7 @@ def test_properties_get_merged_on_entry_update(
         molecule=rdkit.MolFromSmiles("CC"),
         properties={"b": 32},
     )
-    database.update_entries(entry2)
+    database.update_entries(entry2, upsert=False)
     entry = next(database.get_entries("first"))
     molecule = atomlite.json_to_rdkit(entry.molecule)
     assert molecule.GetNumAtoms() == 2
