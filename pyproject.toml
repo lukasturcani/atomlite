@@ -29,20 +29,13 @@ dev = [
   "build",
   "twine",
   "furo",
-  "pip-tools",
 ]
 
 [project.urls]
 github = "https://github.com/lukasturcani/atomlite"
 documentation = "https://atomlite.readthedocs.io"
 
-[tool.setuptools.package-data]
-atomlite = [
-  "py.typed",
-]
-
 [tool.setuptools_scm]
-fallback_version = "0.0.0"
 
 [tool.ruff]
 line-length = 79
