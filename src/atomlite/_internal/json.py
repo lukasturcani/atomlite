@@ -93,16 +93,16 @@ def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
                 | rdkit.BondType.QUADRUPLE
                 | rdkit.BondType.QUINTUPLE
                 | rdkit.BondType.HEXTUPLE
-                | rdkit.BondType.ONEANDHALF
-                | rdkit.BondType.TWOANDHALF
-                | rdkit.BondType.THREEANDHALF
-                | rdkit.BondType.FOURANDHALF
-                | rdkit.BondType.FIVEANDHALF
+                | rdkit.BondType.ONEANDAHALF
+                | rdkit.BondType.TWOANDAHALF
+                | rdkit.BondType.THREEANDAHALF
+                | rdkit.BondType.FOURANDAHALF
+                | rdkit.BondType.FIVEANDAHALF
             ):
                 bonds["atom1"].append(bond.GetBeginAtomIdx())
                 bonds["atom2"].append(bond.GetEndAtomIdx())
                 bonds["order"].append(bond.GetBondTypeAsDouble())
-            case rdkit.BondType.DATTVE:
+            case rdkit.BondType.DATIVE:
                 dative_bonds["atom1"].append(bond.GetBeginAtomIdx())
                 dative_bonds["atom2"].append(bond.GetEndAtomIdx())
                 dative_bonds["order"].append(1.0)
