@@ -26,7 +26,7 @@ autosummary_imported_members = True
 
 autodoc_typehints = "description"
 autodoc_member_order = "groupwise"
-autoclass_content = "both"
+autoclass_content = "class"
 autodoc_type_aliases = {
     "Properties": "dict[str, Json]",
     "Json": "Json",

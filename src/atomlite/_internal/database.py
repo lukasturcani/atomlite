@@ -83,7 +83,14 @@ def _property_entry_to_sqlite(entry: PropertyEntry) -> dict[str, Json]:
 
 
 class Database:
-    """A molecular SQLite database."""
+    """A molecular SQLite database.
+
+    Parameters:
+        database:
+            The path to the database file.
+        molecule_table:
+            The name of the table which stores the molecules.
+    """
 
     connection: sqlite3.Connection
     """
@@ -97,14 +104,6 @@ class Database:
         database: pathlib.Path | str,
         molecule_table: typing.LiteralString = "molecules",
     ) -> None:
-        """Create a database.
-
-        Parameters:
-            database:
-                The path to the database file.
-            molecule_table:
-                The name of the table which stores the molecules.
-        """
         self._molecule_table = molecule_table
         self.connection = sqlite3.connect(database)
         self.connection.execute(
