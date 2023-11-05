@@ -1,5 +1,5 @@
 import atomlite
-import rdkit.Chem as rdkit
+import rdkit.Chem as rdkit  # noqa: N813
 
 
 def test_aromatic_json_serde() -> None:

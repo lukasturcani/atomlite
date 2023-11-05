@@ -1,6 +1,6 @@
 import typing
 
-import rdkit.Chem as rdkit
+import rdkit.Chem as rdkit  # noqa: N813
 
 Json: typing.TypeAlias = (
     bool | float | str | None | list["Json"] | dict[str, "Json"]
@@ -9,9 +9,7 @@ Conformer: typing.TypeAlias = list[list[float]]
 
 
 class Bonds(typing.TypedDict):
-    """
-    JSON representation of bonds.
-    """
+    """JSON representation of bonds."""
 
     atom1: list[int]
     """The indices of the first atom of each bond."""
@@ -22,9 +20,7 @@ class Bonds(typing.TypedDict):
 
 
 class AromaticBonds(typing.TypedDict):
-    """
-    JSON representation of aromatic bonds.
-    """
+    """JSON representation of aromatic bonds."""
 
     atom1: list[int]
     """The indices of the first atom of each bond."""
@@ -33,9 +29,7 @@ class AromaticBonds(typing.TypedDict):
 
 
 class Molecule(typing.TypedDict):
-    """
-    A JSON molecule.
-    """
+    """A JSON molecule."""
 
     atomic_numbers: list[int]
     """Atomic numbers of atoms in the molecule."""
@@ -52,12 +46,12 @@ class Molecule(typing.TypedDict):
 
 
 def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
-    """
-    Create a JSON representation of an :mod:`rdkit` molecule.
+    """Create a JSON representation of an :mod:`rdkit` molecule.
 
     Parameters:
         molecule:
             The molecule to convert to JSON.
+
     Returns:
         A JSON molecule.
     """
@@ -105,9 +99,8 @@ def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
                 aromatic_bonds["atom1"].append(bond.GetBeginAtomIdx())
                 aromatic_bonds["atom2"].append(bond.GetEndAtomIdx())
             case _:
-                raise RuntimeError(
-                    f"unsupported bond type: {bond.GetBondType()}"
-                )
+                msg = f"unsupported bond type: {bond.GetBondType()}"
+                raise RuntimeError(msg)
 
     d: Molecule = {
         "atomic_numbers": atomic_numbers,
@@ -128,12 +121,12 @@ def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
     return d
 
 
-def json_to_rdkit(molecule: Molecule) -> rdkit.Mol:
-    """
-    Create an :mod:`rdkit` molecule from a JSON representation.
+def json_to_rdkit(molecule: Molecule) -> rdkit.Mol:  # noqa: C901
+    """Create an :mod:`rdkit` molecule from a JSON representation.
 
     Parameters:
         molecule: The JSON molecule.
+
     Returns:
         The :mod:`rdkit` molecule.
     """
@@ -169,7 +162,11 @@ def json_to_rdkit(molecule: Molecule) -> rdkit.Mol:
 
     mol = mol.GetMol()
 
-    for atom, charge in zip(mol.GetAtoms(), molecule.get("atom_charges", [])):
+    for atom, charge in zip(
+        mol.GetAtoms(),
+        molecule.get("atom_charges", []),
+        strict=False,
+    ):
         atom.SetFormalCharge(charge)
 
     if "conformers" in molecule:

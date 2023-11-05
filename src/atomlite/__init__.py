@@ -1,3 +1,5 @@
+"""A SQLite chemical database."""
+
 from atomlite._internal.database import (
     Database,
     Entry,
@@ -12,7 +14,7 @@ from atomlite._internal.json import (
     json_to_rdkit,
 )
 
-Json = Json
+Json = Json  # noqa: PLW0127 - allow self assignment so docs work
 """A JSON value."""
 
 

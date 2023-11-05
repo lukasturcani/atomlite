@@ -23,7 +23,7 @@ check:
   (set -x; ruff . )
 
   echo
-  ( set -x; black --check . )
+  ( set -x; ruff format --check . )
 
   echo
   ( set -x; mypy . )
@@ -38,7 +38,7 @@ check:
 
 # Auto-fix code issues.
 fix:
-  black .
+  ruff format .
   ruff --fix .
 
 # Build a release.

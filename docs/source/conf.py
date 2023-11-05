@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "atomlite"
-copyright = "2023, Lukas Turcani"
+project_copyright = "2023, Lukas Turcani"
 author = "Lukas Turcani"
 
 # -- General configuration ---------------------------------------------------
@@ -26,7 +26,7 @@ autosummary_imported_members = True
 
 autodoc_typehints = "description"
 autodoc_member_order = "groupwise"
-autoclass_content = "both"
+autoclass_content = "class"
 autodoc_type_aliases = {
     "Properties": "dict[str, Json]",
     "Json": "Json",
