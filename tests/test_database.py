@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import atomlite
 import numpy as np
 import pytest
-import rdkit.Chem.AllChem as rdkit
+import rdkit.Chem.AllChem as rdkit  # noqa: N813
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,7 +31,7 @@ def test_set_property(database: atomlite.Database) -> None:
     )
     database.add_entries(entry)
     database.set_property("first", "$.a.c", 12)
-    assert database.get_property("first", "$.a.c") == 12
+    assert database.get_property("first", "$.a.c") == 12  # noqa: PLR2004
     database.set_property("second", "$.d.e", "hi")
     assert database.get_property("second", "$.d.e") == "hi"
     (entry,) = database.get_entries()
@@ -77,7 +77,7 @@ def test_get_property(database: atomlite.Database) -> None:
         },
     )
     database.add_entries(entry)
-    assert database.get_property("first", "$.a.b") == 12
+    assert database.get_property("first", "$.a.b") == 12  # noqa: PLR2004
     assert database.get_property("first", "$.a.c") == [1, 2, 3]
     assert database.get_property("first", "$.a.d") == "[4, 5, 6]"
     assert database.get_property("first", "$.a.e") == "hi"
@@ -85,7 +85,7 @@ def test_get_property(database: atomlite.Database) -> None:
     assert database.get_property("first", "$.a.g") == {"a": 12, "b": 24}
     assert database.get_property("first", "$.a.h") is True
     assert database.get_property("first", "$.a.i") is False
-    assert database.get_property("first", "$.a.j") == 12.2
+    assert database.get_property("first", "$.a.j") == 12.2  # noqa: PLR2004
 
 
 def test_entry_is_replaced_on_update(database: atomlite.Database) -> None:
@@ -103,7 +103,7 @@ def test_entry_is_replaced_on_update(database: atomlite.Database) -> None:
     database.update_entries(entry2, merge_properties=False, upsert=False)
     entry = next(database.get_entries("first"))
     molecule = atomlite.json_to_rdkit(entry.molecule)
-    assert molecule.GetNumAtoms() == 2
+    assert molecule.GetNumAtoms() == 2  # noqa: PLR2004
     assert entry.properties == {"b": 32}
 
 
@@ -124,7 +124,7 @@ def test_properties_get_merged_on_entry_update(
     database.update_entries(entry2, upsert=False)
     entry = next(database.get_entries("first"))
     molecule = atomlite.json_to_rdkit(entry.molecule)
-    assert molecule.GetNumAtoms() == 2
+    assert molecule.GetNumAtoms() == 2  # noqa: PLR2004
     assert entry.properties == {"a": 12, "b": 32}
 
 
@@ -152,7 +152,7 @@ def test_upsert(
     database.update_entries(entry2, merge_properties=True, upsert=True)
     (result2,) = list(database.get_entries("first"))
     molecule2 = atomlite.json_to_rdkit(result2.molecule)
-    assert molecule2.GetNumAtoms() == 2
+    assert molecule2.GetNumAtoms() == 2  # noqa: PLR2004
     assert result2.properties == {"a": 12, "b": 32}
 
     entry3 = atomlite.Entry.from_rdkit(
@@ -163,7 +163,7 @@ def test_upsert(
     database.update_entries(entry3, merge_properties=False, upsert=True)
     (result3,) = list(database.get_entries("first"))
     molecule3 = atomlite.json_to_rdkit(result3.molecule)
-    assert molecule3.GetNumAtoms() == 3
+    assert molecule3.GetNumAtoms() == 3  # noqa: PLR2004
     assert result3.properties == {"b": 64}
 
 
@@ -216,7 +216,7 @@ def test_get_entries_returns_all_entries(
     database.add_entries([entry1, entry2, entry3])
 
     retrieved = [entry.key for entry in database.get_entries()]
-    assert len(retrieved) == 3
+    assert len(retrieved) == 3  # noqa: PLR2004
     assert set(retrieved) == {"first", "second", "third"}
 
 
@@ -261,10 +261,12 @@ def test_database_stores_molecular_data_multiple_entries(
 
 def _assert_conformers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
     for conformer1, conformer2 in zip(
-        expected.GetConformers(), actual.GetConformers(), strict=True
+        expected.GetConformers(),
+        actual.GetConformers(),
+        strict=True,
     ):
         assert np.all(
-            np.equal(conformer1.GetPositions(), conformer2.GetPositions())
+            np.equal(conformer1.GetPositions(), conformer2.GetPositions()),
         )
 
 
@@ -274,7 +276,9 @@ def _assert_atom_numbers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
     assert expected.GetNumAtoms() == actual.GetNumAtoms()
     assert expected.GetNumHeavyAtoms() == actual.GetNumHeavyAtoms()
     for atom1, atom2 in zip(
-        expected.GetAtoms(), actual.GetAtoms(), strict=True
+        expected.GetAtoms(),
+        actual.GetAtoms(),
+        strict=True,
     ):
         assert atom1.GetTotalNumHs() == atom2.GetTotalNumHs()
         assert atom1.GetNumExplicitHs() == atom2.GetNumExplicitHs()
@@ -309,7 +313,7 @@ def _embed_molecule(molecule: rdkit.Mol) -> rdkit.Mol:
         },
         {
             "molecule": _embed_molecule(
-                rdkit.AddHs(rdkit.MolFromSmiles("CCC"))
+                rdkit.AddHs(rdkit.MolFromSmiles("CCC")),
             ),
             "properties": {"a": {"b": [1, 2, 3]}},
         },
@@ -357,13 +361,13 @@ def multiple_entry_case(request: pytest.FixtureRequest) -> MultipleEntryCase:
                     param["molecules"],
                     param["properties"],
                     strict=True,
-                )
+                ),
             )
         ),
         molecules=param["molecules"],
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def database() -> atomlite.Database:
     return atomlite.Database(":memory:")

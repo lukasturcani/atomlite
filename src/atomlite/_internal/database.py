@@ -5,7 +5,7 @@ import sqlite3
 import typing
 from dataclasses import asdict, dataclass, field
 
-import rdkit.Chem as rdkit
+import rdkit.Chem as rdkit  # noqa: N813
 
 from atomlite._internal.json import Json, Molecule, json_from_rdkit
 
@@ -14,8 +14,7 @@ Properties: typing.TypeAlias = dict[str, Json] | None
 
 @dataclass(frozen=True, slots=True)
 class Entry:
-    """
-    A database entry.
+    """A database entry.
 
     Parameters:
         key: Key used to uniquely identify the molecule.
@@ -36,8 +35,7 @@ class Entry:
         molecule: rdkit.Mol,
         properties: "Properties" = None,
     ) -> "Entry":
-        """
-        Create an :class:`.Entry` from an :mod:`rdkit` molecule.
+        """Create an :class:`.Entry` from an :mod:`rdkit` molecule.
 
         Parameters:
             key:
@@ -65,8 +63,7 @@ def _entry_to_sqlite(entry: Entry) -> dict[str, Json]:
 
 @dataclass(frozen=True, slots=True)
 class PropertyEntry:
-    """
-    A database property entry.
+    """A database property entry.
 
     Parameters:
         key: Key used to uniquely identify the molecule.
@@ -86,9 +83,7 @@ def _property_entry_to_sqlite(entry: PropertyEntry) -> dict[str, Json]:
 
 
 class Database:
-    """
-    A molecular SQLite database.
-    """
+    """A molecular SQLite database."""
 
     connection: sqlite3.Connection
     """
@@ -102,7 +97,8 @@ class Database:
         database: pathlib.Path | str,
         molecule_table: typing.LiteralString = "molecules",
     ) -> None:
-        """
+        """Create a database.
+
         Parameters:
             database:
                 The path to the database file.
@@ -121,10 +117,10 @@ class Database:
     def add_entries(
         self,
         entries: Entry | collections.abc.Iterable[Entry],
+        *,
         commit: bool = True,
     ) -> None:
-        """
-        Add molecular entries to the database.
+        """Add molecular entries to the database.
 
         Parameters:
             entries (Entry | list[Entry]):
@@ -137,7 +133,7 @@ class Database:
             entries = (entries,)
 
         self.connection.executemany(
-            f"INSERT INTO {self._molecule_table} "
+            f"INSERT INTO {self._molecule_table} "  # noqa: S608
             "VALUES (:key, :molecule, :properties)",
             map(_entry_to_sqlite, entries),
         )
@@ -147,12 +143,12 @@ class Database:
     def update_entries(
         self,
         entries: Entry | collections.abc.Iterable[Entry],
+        *,
         merge_properties: bool = True,
         upsert: bool = True,
         commit: bool = True,
     ) -> None:
-        """
-        Update molecules in the database.
+        """Update molecules in the database.
 
         Parameters:
             entries (Entry | list[Entry]):
@@ -175,7 +171,7 @@ class Database:
         if upsert:
             if merge_properties:
                 self.connection.executemany(
-                    f"INSERT INTO {self._molecule_table} "
+                    f"INSERT INTO {self._molecule_table} "  # noqa: S608
                     "VALUES (:key, :molecule, :properties) "
                     "ON CONFLICT(key) DO UPDATE "
                     "SET molecule=:molecule, "
@@ -185,17 +181,17 @@ class Database:
                 )
             else:
                 self.connection.executemany(
-                    f"INSERT INTO {self._molecule_table} "
+                    f"INSERT INTO {self._molecule_table} "  # noqa: S608
                     "VALUES (:key, :molecule, :properties) "
                     "ON CONFLICT(key) DO UPDATE "
                     "SET molecule=:molecule, properties=:properties "
                     "WHERE key=:key",
                     map(_entry_to_sqlite, entries),
                 )
-        else:
+        else:  # noqa: PLR5501 - nested if statments are more readable
             if merge_properties:
                 self.connection.executemany(
-                    f"UPDATE {self._molecule_table} "
+                    f"UPDATE {self._molecule_table} "  # noqa: S608
                     "SET molecule=:molecule, "
                     "properties=json_patch(properties,:properties) "
                     "WHERE key=:key",
@@ -203,7 +199,7 @@ class Database:
                 )
             else:
                 self.connection.executemany(
-                    f"UPDATE {self._molecule_table} "
+                    f"UPDATE {self._molecule_table} "  # noqa: S608
                     "SET molecule=:molecule, properties=:properties "
                     "WHERE key=:key",
                     map(_entry_to_sqlite, entries),
@@ -215,8 +211,7 @@ class Database:
         self,
         keys: str | collections.abc.Iterable[str] | None = None,
     ) -> collections.abc.Iterator[Entry]:
-        """
-        Get molecular entries from the database.
+        """Get molecular entries from the database.
 
         .. tip::
 
@@ -229,12 +224,13 @@ class Database:
             keys (str | list[str] | None):
                 The keys of the molecules to retrieve from the
                 database. If ``None``, all entries will be returned.
+
         Yields:
             A molecular entry matching `keys`.
         """
         if keys is None:
             for key, molecule, properties in self.connection.execute(
-                f"SELECT * FROM {self._molecule_table} "
+                f"SELECT * FROM {self._molecule_table} "  # noqa: S608
                 "WHERE molecule IS NOT NULL",
             ):
                 yield Entry(
@@ -250,7 +246,7 @@ class Database:
         keys = tuple(keys)
         query = ",".join("?" * len(keys))
         for key, molecule, properties in self.connection.execute(
-            f"SELECT * FROM {self._molecule_table} WHERE key IN ({query})",
+            f"SELECT * FROM {self._molecule_table} WHERE key IN ({query})",  # noqa: S608
             keys,
         ):
             yield Entry(
@@ -260,8 +256,7 @@ class Database:
             )
 
     def get_property(self, key: str, path: str) -> "Json":
-        """
-        Get the property of a molecule.
+        """Get the property of a molecule.
 
         .. note::
 
@@ -281,6 +276,7 @@ class Database:
                 paths are described here_. You can also view various
                 code :ref:`examples<examples-valid-property-paths>`
                 in our docs.
+
         Returns:
             The property. ``None`` will be returned if `key`
             is not present in the database or `path` leads to
@@ -289,7 +285,7 @@ class Database:
         .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         result = self.connection.execute(
-            "SELECT json_extract(properties,?), "
+            "SELECT json_extract(properties,?), "  # noqa: S608
             "json_type(properties,?) "
             f"FROM {self._molecule_table} "
             "WHERE key=?",
@@ -297,23 +293,22 @@ class Database:
         ).fetchone()
         if result is None:
             return None
-        property, property_type = result
-        if property_type == "object" or property_type == "array":
-            return json.loads(property)
-        elif property_type == "true" or property_type == "false":
-            return bool(property)
-        else:
-            return property
+        property_value, property_type = result
+        if property_type in {"object", "array"}:
+            return json.loads(property_value)
+        if property_type in {"true", "false"}:
+            return bool(property_value)
+        return property_value
 
     def set_property(
         self,
         key: str,
         path: str,
-        property: float | str | bool | None,
+        property: float | str | bool | None,  # noqa: A002
+        *,
         commit: bool = True,
     ) -> None:
-        """
-        Set the property of molecule.
+        """Set the property of molecule.
 
         Parameters:
             key:
@@ -345,11 +340,11 @@ class Database:
     def update_properties(
         self,
         entries: PropertyEntry | collections.abc.Iterable[PropertyEntry],
+        *,
         merge_properties: bool = True,
         commit: bool = True,
     ) -> None:
-        """
-        Update molecular properties.
+        """Update molecular properties.
 
         Parameters:
             entries (PropertyEntry | list[PropertyEntry]):
@@ -368,14 +363,14 @@ class Database:
 
         if merge_properties:
             self.connection.executemany(
-                f"UPDATE {self._molecule_table} "
+                f"UPDATE {self._molecule_table} "  # noqa: S608
                 "SET properties=json_patch(properties,:properties) "
                 "WHERE key=:key",
                 map(_property_entry_to_sqlite, entries),
             )
         else:
             self.connection.executemany(
-                f"UPDATE {self._molecule_table} "
+                f"UPDATE {self._molecule_table} "  # noqa: S608
                 "SET properties=:properties "
                 "WHERE key=:key",
                 map(_property_entry_to_sqlite, entries),

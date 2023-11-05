@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "atomlite"
-copyright = "2023, Lukas Turcani"
+project_copyright = "2023, Lukas Turcani"
 author = "Lukas Turcani"
 
 # -- General configuration ---------------------------------------------------
