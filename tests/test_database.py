@@ -259,6 +259,29 @@ def test_database_stores_molecular_data_multiple_entries(
         assert rdkit.MolToSmiles(molecule) == rdkit.MolToSmiles(actual)
 
 
+def test_get_entry(
+    database: atomlite.Database,
+    single_entry_case: SingleEntryCase,
+) -> None:
+    database.add_entries(single_entry_case.entry)
+    retrieved = database.get_entry(single_entry_case.entry.key)
+    assert retrieved is not None
+    retrieved_molecule = atomlite.json_to_rdkit(retrieved.molecule)
+    assert retrieved.key == single_entry_case.entry.key
+    _assert_conformers_match(single_entry_case.molecule, retrieved_molecule)
+    _assert_atom_numbers_match(single_entry_case.molecule, retrieved_molecule)
+    _assert_properties_match(
+        single_entry_case.entry.properties, retrieved.properties
+    )
+
+
+def test_get_entry_returns_none_for_missing_key(
+    database: atomlite.Database,
+) -> None:
+    retrieved = database.get_entry("first")
+    assert retrieved is None
+
+
 def _assert_conformers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
     for conformer1, conformer2 in zip(
         expected.GetConformers(),

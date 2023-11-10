@@ -206,6 +206,41 @@ class Database:
         if commit:
             self.connection.commit()
 
+    def get_entry(self, key: str) -> Entry | None:
+        """Get a molecular entry from the database.
+
+        .. tip::
+
+            The molecules returned from the database are in JSON
+            format, you may need to convert them to something more
+            usable, for example, :mod:`rdkit` molecules with
+            :func:`.json_to_rdkit`.
+
+        Parameters:
+            key: The key of the molecule to retrieve from the database.
+
+        Returns:
+            The molecular entry matching `key` or ``None`` if
+            `key` is not present in the database.
+
+        See Also:
+            * :meth:`.get_entries`: For retrieving multiple entries.
+        """
+        result = self.connection.execute(
+            f"SELECT * FROM {self._molecule_table} "  # noqa: S608
+            "WHERE key=?"
+            "LIMIT 1",
+            (key,),
+        ).fetchone()
+        if result is None:
+            return None
+        key, molecule, properties = result
+        return Entry(
+            key=key,
+            molecule=json.loads(molecule),
+            properties=json.loads(properties),
+        )
+
     def get_entries(
         self,
         keys: str | collections.abc.Iterable[str] | None = None,
@@ -226,6 +261,9 @@ class Database:
 
         Yields:
             A molecular entry matching `keys`.
+
+        See Also:
+            * :meth:`.get_entry`: For retrieving a single entry.
         """
         if keys is None:
             for key, molecule, properties in self.connection.execute(
