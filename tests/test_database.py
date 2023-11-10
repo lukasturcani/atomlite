@@ -19,6 +19,19 @@ class MultipleEntryCase:
     molecules: tuple[rdkit.Mol, ...]
 
 
+def test_num_entries(database: atomlite.Database) -> None:
+    assert database.num_entries() == 0
+    entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+    database.add_entries(entry)
+    assert database.num_entries() == 1
+    entry = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("CC"))
+    database.add_entries(entry)
+    assert database.num_entries() == 2  # noqa: PLR2004
+    entry = atomlite.Entry.from_rdkit("third", rdkit.MolFromSmiles("CCC"))
+    database.add_entries(entry, commit=False)
+    assert database.num_entries() == 3  # noqa: PLR2004
+
+
 def test_has_entry(database: atomlite.Database) -> None:
     entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
     database.add_entries(entry)
