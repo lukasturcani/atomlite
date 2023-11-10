@@ -120,9 +120,6 @@ class Database:
 
             This number includes both the commited and
             uncommited entries.
-
-        Returns:
-            The number of entries in the database.
         """
         return self.connection.execute(
             f"SELECT COUNT(*) FROM {self._molecule_table} "  # noqa: S608
