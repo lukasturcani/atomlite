@@ -19,6 +19,13 @@ class MultipleEntryCase:
     molecules: tuple[rdkit.Mol, ...]
 
 
+def test_has_entry(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+    database.add_entries(entry)
+    assert database.has_entry("first")
+    assert not database.has_entry("second")
+
+
 def test_set_property(database: atomlite.Database) -> None:
     entry = atomlite.Entry.from_rdkit(
         key="first",

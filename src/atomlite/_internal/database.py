@@ -206,6 +206,25 @@ class Database:
         if commit:
             self.connection.commit()
 
+    def has_entry(self, key: str) -> bool:
+        """Check if a molecule is present in the database.
+
+        Parameters:
+            key: The key of the molecule to check.
+
+        Returns:
+            ``True`` if the molecule is present in the database,
+            ``False`` otherwise.
+        """
+        return (
+            self.connection.execute(
+                f"SELECT EXISTS(SELECT 1 FROM {self._molecule_table} "  # noqa: S608
+                "WHERE key=? LIMIT 1)",
+                (key,),
+            ).fetchone()[0]
+            == 1
+        )
+
     def get_entry(self, key: str) -> Entry | None:
         """Get a molecular entry from the database.
 
