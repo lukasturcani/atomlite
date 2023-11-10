@@ -113,6 +113,22 @@ class Database:
             "properties JSON NOT NULL)",
         )
 
+    def num_entries(self) -> int:
+        """Get the number of entries in the database.
+
+        .. note::
+
+            This number includes both the commited and
+            uncommited entries.
+
+        Returns:
+            The number of entries in the database.
+        """
+        return self.connection.execute(
+            f"SELECT COUNT(*) FROM {self._molecule_table} "  # noqa: S608
+            "WHERE molecule IS NOT NULL",
+        ).fetchone()[0]
+
     def add_entries(
         self,
         entries: Entry | collections.abc.Iterable[Entry],
