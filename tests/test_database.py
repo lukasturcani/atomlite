@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 from dataclasses import dataclass
 
 import atomlite
@@ -17,6 +18,29 @@ class SingleEntryCase:
 class MultipleEntryCase:
     entries: tuple[atomlite.Entry, ...]
     molecules: tuple[rdkit.Mol, ...]
+
+
+def test_defaultdict_entry_works(database: atomlite.Database) -> None:
+    d1: dict[str, atomlite.Json] = defaultdict(list)
+    d1["hello"] = [1, 2, 3]
+    entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"), d1)
+    # Add entries to database.
+    database.add_entries(entry)
+    retrieved = database.get_entry("first")
+    assert retrieved is not None
+    _assert_properties_match(entry.properties, retrieved.properties)
+
+
+def test_defaultdict_property_entry_works(database: atomlite.Database) -> None:
+    d1: dict[str, atomlite.Json] = defaultdict(list)
+    d1["hello"] = [1, 2, 3]
+    entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+    property_entry = atomlite.PropertyEntry("first", d1)
+    database.add_entries(entry)
+    database.update_properties(property_entry)
+    retrieved = database.get_entry("first")
+    assert retrieved is not None
+    _assert_properties_match(property_entry.properties, retrieved.properties)
 
 
 def test_num_entries(database: atomlite.Database) -> None:
