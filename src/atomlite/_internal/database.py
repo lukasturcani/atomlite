@@ -3,7 +3,7 @@ import json
 import pathlib
 import sqlite3
 import typing
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 
 import rdkit.Chem as rdkit  # noqa: N813
 
@@ -55,10 +55,11 @@ class Entry:
 
 
 def _entry_to_sqlite(entry: Entry) -> dict[str, Json]:
-    d = asdict(entry)
-    d["molecule"] = json.dumps(d["molecule"])
-    d["properties"] = json.dumps(d["properties"])
-    return d
+    return {
+        "key": entry.key,
+        "molecule": json.dumps(entry.molecule),
+        "properties": json.dumps(entry.properties),
+    }
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,9 +78,10 @@ class PropertyEntry:
 
 
 def _property_entry_to_sqlite(entry: PropertyEntry) -> dict[str, Json]:
-    d = asdict(entry)
-    d["properties"] = json.dumps(d["properties"])
-    return d
+    return {
+        "key": entry.key,
+        "properties": json.dumps(entry.properties),
+    }
 
 
 class Database:
