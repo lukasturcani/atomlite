@@ -24,7 +24,6 @@ def test_defaultdict_entry_works(database: atomlite.Database) -> None:
     d1: dict[str, atomlite.Json] = defaultdict(list)
     d1["hello"] = [1, 2, 3]
     entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"), d1)
-    # Add entries to database.
     database.add_entries(entry)
     retrieved = database.get_entry("first")
     assert retrieved is not None
@@ -41,6 +40,28 @@ def test_defaultdict_property_entry_works(database: atomlite.Database) -> None:
     retrieved = database.get_entry("first")
     assert retrieved is not None
     _assert_properties_match(property_entry.properties, retrieved.properties)
+
+
+def test_bool_property_methods(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        "first", rdkit.MolFromSmiles("C"), {"a": True, "b": 12}
+    )
+    database.add_entries(entry)
+    prop = database.get_bool_property("second", "$.a")
+    assert prop is None
+    prop = database.get_bool_property("first", "$.missing")
+    assert prop is None
+    prop = database.get_bool_property("first", "$.a")
+    assert prop is True
+    database.get_entry("first")
+    print(1)
+    database.set_bool_property("first", "$.a", property=False)
+    database.get_entry("first")
+    prop = database.get_bool_property("first", "$.a")
+    assert prop is False
+
+    with pytest.raises(TypeError):
+        database.get_bool_property("first", "$.b")
 
 
 def test_num_entries(database: atomlite.Database) -> None:
