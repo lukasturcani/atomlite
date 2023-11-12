@@ -83,6 +83,25 @@ def test_int_property_methods(database: atomlite.Database) -> None:
         database.get_int_property("first", "$.a")
 
 
+def test_float_property_methods(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        "first", rdkit.MolFromSmiles("C"), {"a": True, "b": 12.5}
+    )
+    database.add_entries(entry)
+    prop = database.get_float_property("missing", "$.a")
+    assert prop is None
+    prop = database.get_float_property("first", "$.missing")
+    assert prop is None
+    prop = database.get_float_property("first", "$.b")
+    assert prop == 12.5  # noqa: PLR2004
+    database.set_float_property("first", "$.b", 9.7)
+    prop = database.get_float_property("first", "$.b")
+    assert prop == 9.7  # noqa: PLR2004
+
+    with pytest.raises(TypeError):
+        database.get_float_property("first", "$.a")
+
+
 def test_num_entries(database: atomlite.Database) -> None:
     assert database.num_entries() == 0
     entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))

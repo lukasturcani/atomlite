@@ -478,8 +478,44 @@ class Database:
         if commit:
             self.connection.commit()
 
-    def get_float_property(self, key: str, path: str) -> float:
-        pass
+    def get_float_property(self, key: str, path: str) -> float | None:
+        """Get a float property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+
+        Returns:
+            The property. ``None`` will be returned if `key`
+            is not present in the database or `path` leads to
+            a non-existent property.
+
+        Raises:
+            TypeError: If the property is not a float.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        result = self.connection.execute(
+            "SELECT json_extract(properties,?), "  # noqa: S608
+            "json_type(properties,?) "
+            f"FROM {self._molecule_table} "
+            "WHERE key=? LIMIT 1",
+            (path, path, key),
+        ).fetchone()
+        if result is None:
+            return None
+        property_value, property_type = result
+        if property_type is None:
+            return None
+        if property_type != "real":
+            msg = f"{property_type} property is not a float: {property_value}"
+            raise TypeError(msg)
+        return property_value
 
     def set_float_property(
         self,
@@ -489,7 +525,34 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        pass
+        """Set the property of molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            property:
+                The desired value of the property.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        self.connection.execute(
+            f"INSERT INTO {self._molecule_table} (key,properties)"
+            "VALUES (:key,json_set('{}',:path,:property)) "
+            "ON CONFLICT(key) DO UPDATE "
+            "SET properties=json_set(properties,:path,:property) "
+            "WHERE key=:key",
+            {"key": key, "path": path, "property": property},
+        )
+        if commit:
+            self.connection.commit()
 
     def get_str_property(self, key: str, path: str) -> str:
         pass
