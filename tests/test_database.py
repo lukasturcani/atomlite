@@ -102,6 +102,25 @@ def test_float_property_methods(database: atomlite.Database) -> None:
         database.get_float_property("first", "$.a")
 
 
+def test_str_property_methods(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        "first", rdkit.MolFromSmiles("C"), {"a": True, "b": "hello"}
+    )
+    database.add_entries(entry)
+    prop = database.get_str_property("missing", "$.a")
+    assert prop is None
+    prop = database.get_str_property("first", "$.missing")
+    assert prop is None
+    prop = database.get_str_property("first", "$.b")
+    assert prop == "hello"
+    database.set_str_property("first", "$.b", "bye")
+    prop = database.get_str_property("first", "$.b")
+    assert prop == "bye"
+
+    with pytest.raises(TypeError):
+        database.get_str_property("first", "$.a")
+
+
 def test_num_entries(database: atomlite.Database) -> None:
     assert database.num_entries() == 0
     entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
