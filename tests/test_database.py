@@ -47,18 +47,18 @@ def test_bool_property_methods(database: atomlite.Database) -> None:
         "first", rdkit.MolFromSmiles("C"), {"a": True, "b": 12}
     )
     database.add_entries(entry)
-    prop = database.get_bool_property("second", "$.a")
+    prop = database.get_bool_property("missing", "$.a")
     assert prop is None
     prop = database.get_bool_property("first", "$.missing")
     assert prop is None
     prop = database.get_bool_property("first", "$.a")
     assert prop is True
-    database.get_entry("first")
-    print(1)
     database.set_bool_property("first", "$.a", property=False)
-    database.get_entry("first")
     prop = database.get_bool_property("first", "$.a")
     assert prop is False
+    database.set_bool_property("first", "$.a", property=True)
+    prop = database.get_bool_property("first", "$.a")
+    assert prop is True
 
     with pytest.raises(TypeError):
         database.get_bool_property("first", "$.b")

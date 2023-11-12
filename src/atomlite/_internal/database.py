@@ -357,7 +357,6 @@ class Database:
         if result is None:
             return None
         property_value, property_type = result
-        print(property_type)
         if property_type is None:
             return None
         if property_type not in {"true", "false"}:
@@ -391,11 +390,12 @@ class Database:
 
         .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
+        value = "true" if property else "false"
         self.connection.execute(
             f"INSERT INTO {self._molecule_table} (key,properties)"
-            "VALUES (:key,json_set('{}',:path,:property)) "
+            f"VALUES (:key,json_set('{{}}',:path,json('{value}'))) "
             "ON CONFLICT(key) DO UPDATE "
-            "SET properties=json_set(properties,:path,:property) "
+            f"SET properties=json_set(properties,:path,json('{value}')) "
             "WHERE key=:key",
             {"key": key, "path": path, "property": property},
         )
