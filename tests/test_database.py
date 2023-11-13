@@ -140,6 +140,23 @@ def test_remove_property(database: atomlite.Database) -> None:
     assert database.get_property("first", "$.a.b") is None
 
 
+def test_get_property_entry(database: atomlite.Database) -> None:
+    database.set_property("first", "$.a.b", 12)
+    prop_entry = database.get_property_entry("first")
+    assert prop_entry is not None
+    assert prop_entry.key == "first"
+    assert prop_entry.properties == {"a": {"b": 12}}
+
+
+def test_get_property_entries(database: atomlite.Database) -> None:
+    database.set_property("first", "$.a.b", 12)
+    database.set_property("second", "$.a.b", 12)
+    prop_entries = database.get_property_entries()
+    assert len(prop_entries) == 2  # noqa: PLR2004
+    assert prop_entries[0].key == "first"
+    assert prop_entries[1].key == "second"
+
+
 def test_num_entries(database: atomlite.Database) -> None:
     assert database.num_entries() == 0
     entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
@@ -151,13 +168,41 @@ def test_num_entries(database: atomlite.Database) -> None:
     entry = atomlite.Entry.from_rdkit("third", rdkit.MolFromSmiles("CCC"))
     database.add_entries(entry, commit=False)
     assert database.num_entries() == 3  # noqa: PLR2004
+    database.set_property("fourth", "$.a", 12)
+    assert database.num_entries() == 3  # noqa: PLR2004
+
+
+def test_property_num_entries(database: atomlite.Database) -> None:
+    assert database.num_property_entries() == 0
+    entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+    database.add_entries(entry)
+    assert database.num_property_entries() == 1
+    entry = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("CC"))
+    database.add_entries(entry)
+    assert database.num_property_entries() == 2  # noqa: PLR2004
+    entry = atomlite.Entry.from_rdkit("third", rdkit.MolFromSmiles("CCC"))
+    database.add_entries(entry, commit=False)
+    assert database.num_property_entries() == 3  # noqa: PLR2004
+    database.set_property("fourth", "$.a", 12)
+    assert database.num_property_entries() == 4  # noqa: PLR2004
 
 
 def test_has_entry(database: atomlite.Database) -> None:
     entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
     database.add_entries(entry)
+    database.set_property("second", "$.a", 12)
     assert database.has_entry("first")
     assert not database.has_entry("second")
+    assert not database.has_entry("third")
+
+
+def test_has_property_entry(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+    database.add_entries(entry)
+    database.set_property("second", "$.a", 12)
+    assert database.has_property_entry("first")
+    assert database.has_property_entry("second")
+    assert not database.has_property_entry("third")
 
 
 def test_set_property(database: atomlite.Database) -> None:

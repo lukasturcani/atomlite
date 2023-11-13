@@ -116,7 +116,7 @@ class Database:
         )
 
     def num_entries(self) -> int:
-        """Get the number of entries in the database.
+        """Get the number of molecular entries in the database.
 
         .. note::
 
@@ -126,6 +126,18 @@ class Database:
         return self.connection.execute(
             f"SELECT COUNT(*) FROM {self._molecule_table} "  # noqa: S608
             "WHERE molecule IS NOT NULL",
+        ).fetchone()[0]
+
+    def num_property_entries(self) -> int:
+        """Get the number of property entries in the database.
+
+        .. note::
+
+            This number includes both the commited and
+            uncommited entries.
+        """
+        return self.connection.execute(
+            f"SELECT COUNT(*) FROM {self._molecule_table}"  # noqa: S608
         ).fetchone()[0]
 
     def add_entries(
@@ -186,7 +198,7 @@ class Database:
         upsert: bool = True,
         commit: bool = True,
     ) -> None:
-        """Update molecules in the database.
+        """Update molecular entries in the database.
 
         Parameters:
             entries (Entry | list[Entry]):
@@ -246,19 +258,41 @@ class Database:
             self.connection.commit()
 
     def has_entry(self, key: str) -> bool:
-        """Check if a molecule is present in the database.
+        """Check if a molecular entry is present in the database.
 
         Parameters:
             key: The key of the molecule to check.
 
         Returns:
-            ``True`` if the molecule is present in the database,
+            ``True`` if the entry is present in the database,
             ``False`` otherwise.
         """
         return (
             self.connection.execute(
                 f"SELECT EXISTS(SELECT 1 FROM {self._molecule_table} "  # noqa: S608
-                "WHERE key=? LIMIT 1)",
+                "WHERE key=? "
+                "AND molecule IS NOT NULL "
+                "LIMIT 1)",
+                (key,),
+            ).fetchone()[0]
+            == 1
+        )
+
+    def has_property_entry(self, key: str) -> bool:
+        """Check if a property entry is present in the database.
+
+        Parameters:
+            key: The key of the molecule to check.
+
+        Returns:
+            ``True`` if the entry is present in the database,
+            ``False`` otherwise.
+        """
+        return (
+            self.connection.execute(
+                f"SELECT EXISTS(SELECT 1 FROM {self._molecule_table} "  # noqa: S608
+                "WHERE key=? "
+                "LIMIT 1)",
                 (key,),
             ).fetchone()[0]
             == 1
@@ -349,6 +383,63 @@ class Database:
                 properties=json.loads(properties),
             )
 
+    def get_property_entry(self, key: str) -> PropertyEntry | None:
+        """Get a property entry from the database.
+
+        Parameters:
+            key: The key of the molecule to retrieve from the database.
+
+        Returns:
+            The property entry matching `key` or ``None`` if
+            `key` is not present in the database.
+
+        See Also:
+            * :meth:`.get_property_entries`: For retrieving multiple entries.
+        """
+        result = self.connection.execute(
+            f"SELECT key,properties FROM {self._molecule_table} "  # noqa: S608
+            "WHERE key=? LIMIT 1",
+            (key,),
+        ).fetchone()
+        if result is None:
+            return None
+        key, properties = result
+        return PropertyEntry(key=key, properties=json.loads(properties))
+
+    def get_property_entries(
+        self,
+        keys: str | collections.abc.Iterable[str] | None = None,
+    ) -> collections.abc.Iterator[PropertyEntry]:
+        """Get property entries from the database.
+
+        Parameters:
+            keys (str | list[str] | None):
+                The keys of the molecules to whose properties
+                need to be retrieved from the database.
+                If ``None`` all entries will be returned.
+
+        Yields:
+            A property entry matching `keys`.
+        """
+        if keys is None:
+            for key, properties in self.connection.execute(
+                f"SELECT key,properties FROM {self._molecule_table}"  # noqa: S608
+            ):
+                yield PropertyEntry(key=key, properties=json.loads(properties))
+            return
+
+        if isinstance(keys, str):
+            keys = (keys,)
+
+        keys = tuple(keys)
+        query = ",".join("?" * len(keys))
+        for key, properties in self.connection.execute(
+            f"SELECT key,properties FROM {self._molecule_table} "  # noqa: S608
+            f"WHERE key IN ({query})",
+            keys,
+        ):
+            yield PropertyEntry(key=key, properties=json.loads(properties))
+
     def get_bool_property(self, key: str, path: str) -> bool | None:
         """Get a boolean property of a molecule.
 
@@ -396,7 +487,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of a molecule.
+        """Set a boolean property of a molecule.
 
         Parameters:
             key:
@@ -463,7 +554,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of a molecule.
+        """Set an integer property of a molecule.
 
         Parameters:
             key:
@@ -530,7 +621,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of a molecule.
+        """Set a float property of a molecule.
 
         Parameters:
             key:
@@ -597,7 +688,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of a molecule.
+        """Set a string property of a molecule.
 
         Parameters:
             key:
@@ -747,7 +838,7 @@ class Database:
         merge_properties: bool = True,
         commit: bool = True,
     ) -> None:
-        """Update molecular properties.
+        """Update property entries in the database.
 
         Parameters:
             entries (PropertyEntry | list[PropertyEntry]):
