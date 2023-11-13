@@ -372,7 +372,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of molecule.
+        """Set the property of a molecule.
 
         Parameters:
             key:
@@ -439,7 +439,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of molecule.
+        """Set the property of a molecule.
 
         Parameters:
             key:
@@ -506,7 +506,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of molecule.
+        """Set the property of a molecule.
 
         Parameters:
             key:
@@ -573,7 +573,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of molecule.
+        """Set the property of a molecule.
 
         Parameters:
             key:
@@ -646,7 +646,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of molecule.
+        """Set the property of a molecule.
 
         Parameters:
             key:
