@@ -154,6 +154,30 @@ class Database:
         if commit:
             self.connection.commit()
 
+    def remove_entries(
+        self,
+        keys: str | collections.abc.Iterable[str],
+        *,
+        commit: bool = True,
+    ) -> None:
+        """Remove molecular entries from the database.
+
+        Parameters:
+            keys: The keys of the molecules to remove from the database.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+        """
+        if isinstance(keys, str):
+            keys = (keys,)
+        self.connection.executemany(
+            f"DELETE FROM {self._molecule_table} "  # noqa: S608
+            "WHERE key=?",
+            ((key,) for key in keys),
+        )
+        if commit:
+            self.connection.commit()
+
     def update_entries(
         self,
         entries: Entry | collections.abc.Iterable[Entry],
@@ -684,6 +708,34 @@ class Database:
             f"SET properties=json_set(properties,:path,json('{value}')) "
             "WHERE key=:key",
             {"key": key, "path": path, "property": property},
+        )
+        if commit:
+            self.connection.commit()
+
+    def remove_property(
+        self, key: str, path: str, *, commit: bool = True
+    ) -> None:
+        """Remove a property from a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+
+        .. _here: https://www.sqlite.org/json1.html
+        """
+        self.connection.execute(
+            f"UPDATE {self._molecule_table} "  # noqa: S608
+            "SET properties=json_remove(properties,:path) "
+            "WHERE key=:key",
+            {"key": key, "path": path},
         )
         if commit:
             self.connection.commit()

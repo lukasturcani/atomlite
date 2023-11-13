@@ -121,6 +121,25 @@ def test_str_property_methods(database: atomlite.Database) -> None:
         database.get_str_property("first", "$.a")
 
 
+def test_remove_entries(database: atomlite.Database) -> None:
+    entry1 = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
+    entry2 = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("C"))
+    database.add_entries([entry1, entry2])
+    assert database.has_entry("first")
+    database.remove_entries("first")
+    assert not database.has_entry("first")
+
+
+def test_remove_property(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        "first", rdkit.MolFromSmiles("C"), {"a": {"b": 12}}
+    )
+    database.add_entries(entry)
+    assert database.get_property("first", "$.a.b") == 12  # noqa: PLR2004
+    database.remove_property("first", "$.a.b")
+    assert database.get_property("first", "$.a.b") is None
+
+
 def test_num_entries(database: atomlite.Database) -> None:
     assert database.num_entries() == 0
     entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"))
