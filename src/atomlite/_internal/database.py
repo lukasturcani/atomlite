@@ -3,7 +3,6 @@ import json
 import pathlib
 import sqlite3
 import typing
-from typing import assert_never
 from dataclasses import dataclass, field
 
 import rdkit.Chem as rdkit  # noqa: N813
