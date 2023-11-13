@@ -368,8 +368,6 @@ class Database:
 
         Raises:
             TypeError: If the property is not a boolean.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         result = self.connection.execute(
             "SELECT json_extract(properties,?), "  # noqa: S608
@@ -411,8 +409,6 @@ class Database:
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         self.set_property(key, path, property, commit=commit)
 
@@ -435,8 +431,6 @@ class Database:
 
         Raises:
             TypeError: If the property is not an integer.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         result = self.connection.execute(
             "SELECT json_extract(properties,?), "  # noqa: S608
@@ -478,8 +472,6 @@ class Database:
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         self.set_property(key, path, property, commit=commit)
 
@@ -502,8 +494,6 @@ class Database:
 
         Raises:
             TypeError: If the property is not a float.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         result = self.connection.execute(
             "SELECT json_extract(properties,?), "  # noqa: S608
@@ -545,8 +535,6 @@ class Database:
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         self.set_property(key, path, property, commit=commit)
 
@@ -569,8 +557,6 @@ class Database:
 
         Raises:
             TypeError: If the property is not a string.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         result = self.connection.execute(
             "SELECT json_extract(properties,?), "  # noqa: S608
@@ -612,8 +598,6 @@ class Database:
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         self.set_property(key, path, property, commit=commit)
 
@@ -643,8 +627,6 @@ class Database:
             The property. ``None`` will be returned if `key`
             is not present in the database or `path` leads to
             a non-existent property.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         result = self.connection.execute(
             "SELECT json_extract(properties,?), "  # noqa: S608
@@ -728,8 +710,6 @@ class Database:
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.
-
-        .. _here: https://www.sqlite.org/json1.html
         """
         self.connection.execute(
             f"UPDATE {self._molecule_table} "  # noqa: S608
