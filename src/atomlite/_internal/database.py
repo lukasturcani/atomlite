@@ -357,8 +357,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
 
         Returns:
@@ -401,8 +403,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
             property:
                 The desired value of the property.
@@ -420,8 +424,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
 
         Returns:
@@ -464,8 +470,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
             property:
                 The desired value of the property.
@@ -483,8 +491,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
 
         Returns:
@@ -527,8 +537,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
             property:
                 The desired value of the property.
@@ -546,8 +558,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
 
         Returns:
@@ -590,8 +604,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
             property:
                 The desired value of the property.
@@ -619,8 +635,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
 
         Returns:
@@ -659,16 +677,16 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
             property:
                 The desired value of the property.
             commit:
                 If ``True`` changes will be automatically
                 commited to the database file.
-
-        .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
         match property:
             case None:
@@ -704,8 +722,10 @@ class Database:
                 The key of the molecule.
             path:
                 A path to the property of the molecule. Valid
-                paths are described here_. You can also view various
-                code :ref:`examples<examples-valid-property-paths>`
+                paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
                 in our docs.
             commit:
                 If ``True`` changes will be automatically
