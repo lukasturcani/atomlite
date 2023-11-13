@@ -420,6 +420,9 @@ class Database:
 
         Yields:
             A property entry matching `keys`.
+
+        See Also:
+            * :meth:`.get_property_entry`: For retrieving a single entry.
         """
         if keys is None:
             for key, properties in self.connection.execute(
