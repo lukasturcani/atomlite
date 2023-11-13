@@ -24,7 +24,6 @@ def test_defaultdict_entry_works(database: atomlite.Database) -> None:
     d1: dict[str, atomlite.Json] = defaultdict(list)
     d1["hello"] = [1, 2, 3]
     entry = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"), d1)
-    # Add entries to database.
     database.add_entries(entry)
     retrieved = database.get_entry("first")
     assert retrieved is not None
@@ -41,6 +40,85 @@ def test_defaultdict_property_entry_works(database: atomlite.Database) -> None:
     retrieved = database.get_entry("first")
     assert retrieved is not None
     _assert_properties_match(property_entry.properties, retrieved.properties)
+
+
+def test_bool_property_methods(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        "first", rdkit.MolFromSmiles("C"), {"a": True, "b": 12}
+    )
+    database.add_entries(entry)
+    prop = database.get_bool_property("missing", "$.a")
+    assert prop is None
+    prop = database.get_bool_property("first", "$.missing")
+    assert prop is None
+    prop = database.get_bool_property("first", "$.a")
+    assert prop is True
+    database.set_bool_property("first", "$.a", property=False)
+    prop = database.get_bool_property("first", "$.a")
+    assert prop is False
+    database.set_bool_property("first", "$.a", property=True)
+    prop = database.get_bool_property("first", "$.a")
+    assert prop is True
+
+    with pytest.raises(TypeError):
+        database.get_bool_property("first", "$.b")
+
+
+def test_int_property_methods(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        "first", rdkit.MolFromSmiles("C"), {"a": True, "b": 12}
+    )
+    database.add_entries(entry)
+    prop = database.get_int_property("missing", "$.a")
+    assert prop is None
+    prop = database.get_int_property("first", "$.missing")
+    assert prop is None
+    prop = database.get_int_property("first", "$.b")
+    assert prop == 12  # noqa: PLR2004
+    database.set_int_property("first", "$.b", 9)
+    prop = database.get_int_property("first", "$.b")
+    assert prop == 9  # noqa: PLR2004
+
+    with pytest.raises(TypeError):
+        database.get_int_property("first", "$.a")
+
+
+def test_float_property_methods(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        "first", rdkit.MolFromSmiles("C"), {"a": True, "b": 12.5}
+    )
+    database.add_entries(entry)
+    prop = database.get_float_property("missing", "$.a")
+    assert prop is None
+    prop = database.get_float_property("first", "$.missing")
+    assert prop is None
+    prop = database.get_float_property("first", "$.b")
+    assert prop == 12.5  # noqa: PLR2004
+    database.set_float_property("first", "$.b", 9.7)
+    prop = database.get_float_property("first", "$.b")
+    assert prop == 9.7  # noqa: PLR2004
+
+    with pytest.raises(TypeError):
+        database.get_float_property("first", "$.a")
+
+
+def test_str_property_methods(database: atomlite.Database) -> None:
+    entry = atomlite.Entry.from_rdkit(
+        "first", rdkit.MolFromSmiles("C"), {"a": True, "b": "hello"}
+    )
+    database.add_entries(entry)
+    prop = database.get_str_property("missing", "$.a")
+    assert prop is None
+    prop = database.get_str_property("first", "$.missing")
+    assert prop is None
+    prop = database.get_str_property("first", "$.b")
+    assert prop == "hello"
+    database.set_str_property("first", "$.b", "bye")
+    prop = database.get_str_property("first", "$.b")
+    assert prop == "bye"
+
+    with pytest.raises(TypeError):
+        database.get_str_property("first", "$.a")
 
 
 def test_num_entries(database: atomlite.Database) -> None:
@@ -80,6 +158,12 @@ def test_set_property(database: atomlite.Database) -> None:
     assert database.get_property("second", "$.d.e") == "hi"
     (entry,) = database.get_entries()
     assert entry.key == "first"
+    database.set_property("first", "$.a.boolean", property=False)
+    assert database.get_property("first", "$.a.boolean") is False
+    database.set_property("first", "$.a.none", None)
+    assert database.get_property("first", "$.a.none") is None
+    database.set_property("first", "$.a.float", 13.5)
+    assert database.get_property("first", "$.a.float") == 13.5  # noqa: PLR2004
 
 
 def test_get_missing_property(database: atomlite.Database) -> None:

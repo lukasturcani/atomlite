@@ -350,6 +350,14 @@ There is a simple way to do this!
 
   * :meth:`.Database.get_property`: For additional documentation.
   * :meth:`.Database.set_property`: For additional documentation.
+  * :meth:`.Database.get_bool_property`: For type-safe access to boolean properties.
+  * :meth:`.Database.set_bool_property`: For type-safe setting of boolean properties.
+  * :meth:`.Database.get_int_property`: For type-safe access to integer properties.
+  * :meth:`.Database.set_int_property`: For type-safe setting of integer properties.
+  * :meth:`.Database.get_float_property`: For type-safe access to float properties.
+  * :meth:`.Database.set_float_property`: For type-safe setting of float properties.
+  * :meth:`.Database.get_str_property`: For type-safe access to string properties.
+  * :meth:`.Database.set_str_property`: For type-safe setting of string properties.
 
 .. _examples-valid-property-paths:
 

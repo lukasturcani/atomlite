@@ -262,8 +262,7 @@ class Database:
         """
         result = self.connection.execute(
             f"SELECT * FROM {self._molecule_table} "  # noqa: S608
-            "WHERE key=?"
-            "LIMIT 1",
+            "WHERE key=? LIMIT 1",
             (key,),
         ).fetchone()
         if result is None:
@@ -326,6 +325,274 @@ class Database:
                 properties=json.loads(properties),
             )
 
+    def get_bool_property(self, key: str, path: str) -> bool | None:
+        """Get a boolean property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+
+        Returns:
+            The property. ``None`` will be returned if `key`
+            is not present in the database or `path` leads to
+            a non-existent property.
+
+        Raises:
+            TypeError: If the property is not a boolean.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        result = self.connection.execute(
+            "SELECT json_extract(properties,?), "  # noqa: S608
+            "json_type(properties,?) "
+            f"FROM {self._molecule_table} "
+            "WHERE key=? LIMIT 1",
+            (path, path, key),
+        ).fetchone()
+        if result is None:
+            return None
+        property_value, property_type = result
+        if property_type is None:
+            return None
+        if property_type not in {"true", "false"}:
+            msg = f"{property_type} property is not a bool: {property_value}"
+            raise TypeError(msg)
+        return bool(property_value)
+
+    def set_bool_property(
+        self,
+        key: str,
+        path: str,
+        property: bool,  # noqa: A002, FBT001
+        *,
+        commit: bool = True,
+    ) -> None:
+        """Set the property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            property:
+                The desired value of the property.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        self.set_property(key, path, property, commit=commit)
+
+    def get_int_property(self, key: str, path: str) -> int | None:
+        """Get an integer property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+
+        Returns:
+            The property. ``None`` will be returned if `key`
+            is not present in the database or `path` leads to
+            a non-existent property.
+
+        Raises:
+            TypeError: If the property is not an integer.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        result = self.connection.execute(
+            "SELECT json_extract(properties,?), "  # noqa: S608
+            "json_type(properties,?) "
+            f"FROM {self._molecule_table} "
+            "WHERE key=? LIMIT 1",
+            (path, path, key),
+        ).fetchone()
+        if result is None:
+            return None
+        property_value, property_type = result
+        if property_type is None:
+            return None
+        if property_type != "integer":
+            msg = f"{property_type} property is not an int: {property_value}"
+            raise TypeError(msg)
+        return property_value
+
+    def set_int_property(
+        self,
+        key: str,
+        path: str,
+        property: int,  # noqa: A002
+        *,
+        commit: bool = True,
+    ) -> None:
+        """Set the property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            property:
+                The desired value of the property.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        self.set_property(key, path, property, commit=commit)
+
+    def get_float_property(self, key: str, path: str) -> float | None:
+        """Get a float property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+
+        Returns:
+            The property. ``None`` will be returned if `key`
+            is not present in the database or `path` leads to
+            a non-existent property.
+
+        Raises:
+            TypeError: If the property is not a float.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        result = self.connection.execute(
+            "SELECT json_extract(properties,?), "  # noqa: S608
+            "json_type(properties,?) "
+            f"FROM {self._molecule_table} "
+            "WHERE key=? LIMIT 1",
+            (path, path, key),
+        ).fetchone()
+        if result is None:
+            return None
+        property_value, property_type = result
+        if property_type is None:
+            return None
+        if property_type != "real":
+            msg = f"{property_type} property is not a float: {property_value}"
+            raise TypeError(msg)
+        return property_value
+
+    def set_float_property(
+        self,
+        key: str,
+        path: str,
+        property: float,  # noqa: A002
+        *,
+        commit: bool = True,
+    ) -> None:
+        """Set the property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            property:
+                The desired value of the property.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        self.set_property(key, path, property, commit=commit)
+
+    def get_str_property(self, key: str, path: str) -> str | None:
+        """Get a string property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+
+        Returns:
+            The property. ``None`` will be returned if `key`
+            is not present in the database or `path` leads to
+            a non-existent property.
+
+        Raises:
+            TypeError: If the property is not a string.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        result = self.connection.execute(
+            "SELECT json_extract(properties,?), "  # noqa: S608
+            "json_type(properties,?) "
+            f"FROM {self._molecule_table} "
+            "WHERE key=? LIMIT 1",
+            (path, path, key),
+        ).fetchone()
+        if result is None:
+            return None
+        property_value, property_type = result
+        if property_type is None:
+            return None
+        if property_type != "text":
+            msg = f"{property_type} property is not a str: {property_value}"
+            raise TypeError(msg)
+        return property_value
+
+    def set_str_property(
+        self,
+        key: str,
+        path: str,
+        property: str,  # noqa: A002
+        *,
+        commit: bool = True,
+    ) -> None:
+        """Set the property of a molecule.
+
+        Parameters:
+            key:
+                The key of the molecule.
+            path:
+                A path to the property of the molecule. Valid
+                paths are described here_. You can also view various
+                code :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            property:
+                The desired value of the property.
+            commit:
+                If ``True`` changes will be automatically
+                commited to the database file.
+
+        .. _here: https://www.sqlite.org/json1.html#path_arguments
+        """
+        self.set_property(key, path, property, commit=commit)
+
     def get_property(self, key: str, path: str) -> "Json":
         """Get the property of a molecule.
 
@@ -359,7 +626,7 @@ class Database:
             "SELECT json_extract(properties,?), "  # noqa: S608
             "json_type(properties,?) "
             f"FROM {self._molecule_table} "
-            "WHERE key=?",
+            "WHERE key=? LIMIT 1",
             (path, path, key),
         ).fetchone()
         if result is None:
@@ -379,7 +646,7 @@ class Database:
         *,
         commit: bool = True,
     ) -> None:
-        """Set the property of molecule.
+        """Set the property of a molecule.
 
         Parameters:
             key:
@@ -397,11 +664,24 @@ class Database:
 
         .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
+        match property:
+            case None:
+                value = "null"
+            case bool():
+                value = "true" if property else "false"
+            case int():
+                value = str(property)
+            case float():
+                value = str(property)
+            case str():
+                value = json.dumps(property)
+            case _ as unreachable:
+                typing.assert_never(unreachable)
         self.connection.execute(
             f"INSERT INTO {self._molecule_table} (key,properties)"
-            "VALUES (:key,json_set('{}',:path,:property)) "
+            f"VALUES (:key,json_set('{{}}',:path,json('{value}'))) "
             "ON CONFLICT(key) DO UPDATE "
-            "SET properties=json_set(properties,:path,:property) "
+            f"SET properties=json_set(properties,:path,json('{value}')) "
             "WHERE key=:key",
             {"key": key, "path": path, "property": property},
         )
