@@ -146,6 +146,8 @@ def test_get_property_entry(database: atomlite.Database) -> None:
     assert prop_entry is not None
     assert prop_entry.key == "first"
     assert prop_entry.properties == {"a": {"b": 12}}
+    prop_entry = database.get_property_entry("second")
+    assert prop_entry is None
 
 
 def test_get_property_entries_returns_all_entries(
@@ -159,6 +161,16 @@ def test_get_property_entries_returns_all_entries(
     assert prop_entries[0].properties == {"a": {"b": 12}}
     assert prop_entries[1].key == "second"
     assert prop_entries[1].properties == {"a": {"b": 12}}
+
+
+def test_get_property_entries_returns_entries_of_keys(
+    database: atomlite.Database,
+) -> None:
+    database.set_property("first", "$.a.b", 12)
+    database.set_property("second", "$.a.b", 12)
+    (prop_entry,) = list(database.get_property_entries("first"))
+    assert prop_entry.key == "first"
+    assert prop_entry.properties == {"a": {"b": 12}}
 
 
 def test_num_entries(database: atomlite.Database) -> None:
