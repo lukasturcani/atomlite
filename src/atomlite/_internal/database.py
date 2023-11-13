@@ -3,6 +3,7 @@ import json
 import pathlib
 import sqlite3
 import typing
+from typing import assert_never
 from dataclasses import dataclass, field
 
 import rdkit.Chem as rdkit  # noqa: N813
@@ -390,17 +391,7 @@ class Database:
 
         .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
-        value = "true" if property else "false"
-        self.connection.execute(
-            f"INSERT INTO {self._molecule_table} (key,properties)"
-            f"VALUES (:key,json_set('{{}}',:path,json('{value}'))) "
-            "ON CONFLICT(key) DO UPDATE "
-            f"SET properties=json_set(properties,:path,json('{value}')) "
-            "WHERE key=:key",
-            {"key": key, "path": path, "property": property},
-        )
-        if commit:
-            self.connection.commit()
+        self.set_property(key, path, property, commit=commit)
 
     def get_int_property(self, key: str, path: str) -> int | None:
         """Get an integer property of a molecule.
@@ -674,11 +665,24 @@ class Database:
 
         .. _here: https://www.sqlite.org/json1.html#path_arguments
         """
+        match property:
+            case None:
+                value = "null"
+            case bool():
+                value = "true" if property else "false"
+            case int():
+                value = str(property)
+            case float():
+                value = str(property)
+            case str():
+                value = json.dumps(property)
+            case _ as unreachable:
+                typing.assert_never(unreachable)
         self.connection.execute(
             f"INSERT INTO {self._molecule_table} (key,properties)"
-            "VALUES (:key,json_set('{}',:path,:property)) "
+            f"VALUES (:key,json_set('{{}}',:path,json('{value}'))) "
             "ON CONFLICT(key) DO UPDATE "
-            "SET properties=json_set(properties,:path,:property) "
+            f"SET properties=json_set(properties,:path,json('{value}')) "
             "WHERE key=:key",
             {"key": key, "path": path, "property": property},
         )

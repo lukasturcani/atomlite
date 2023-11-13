@@ -158,6 +158,12 @@ def test_set_property(database: atomlite.Database) -> None:
     assert database.get_property("second", "$.d.e") == "hi"
     (entry,) = database.get_entries()
     assert entry.key == "first"
+    database.set_property("first", "$.a.boolean", property=False)
+    assert database.get_property("first", "$.a.boolean") is False
+    database.set_property("first", "$.a.none", None)
+    assert database.get_property("first", "$.a.none") is None
+    database.set_property("first", "$.a.float", 13.5)
+    assert database.get_property("first", "$.a.float") == 13.5  # noqa: PLR2004
 
 
 def test_get_missing_property(database: atomlite.Database) -> None:
