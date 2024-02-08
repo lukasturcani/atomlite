@@ -22,7 +22,6 @@ dev = [
   "mypy",
   "numpy",
   "pytest",
-  "pytest-benchmark",
   "pytest-cov",
   "sphinx",
   "sphinx-copybutton",
@@ -42,13 +41,13 @@ line-length = 79
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["ANN101", "ANN401", "COM812", "ISC001"]
+ignore = ["ANN101", "COM812", "ISC001"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"{tests,benchmarks}/*" = [
+"tests/*" = [
   "D100",
   "D101",
   "D102",
@@ -79,16 +78,3 @@ module = [
   "rdkit.*"
 ]
 ignore_missing_imports = true
-
-[tool.pytest.ini_options]
-testpaths = [
-  "tests",
-]
-python_files = [
-  "test_*.py",
-  "benchmark_*.py",
-]
-python_functions = [
-  "test_*",
-  "benchmark_*",
-]
