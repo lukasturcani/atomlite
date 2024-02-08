@@ -47,7 +47,7 @@ def _get_entries(file: Path) -> Iterator[atomlite.Entry]:
         if molecule is not None:
             try:
                 yield atomlite.Entry.from_rdkit(
-                    key=f"{i}",
+                    key=str(i),
                     molecule=molecule,
                     properties=molecule.GetPropsAsDict(includePrivate=True),
                 )
