@@ -24,9 +24,20 @@ def main() -> None:
 
 
 def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path)
-    parser.add_argument("output", type=Path)
+    parser = argparse.ArgumentParser(
+        description="Create a database from an SDF file.",
+    )
+    parser.add_argument(
+        "input_sdf",
+        help=(
+            "The input SDF file consisting of multiple "
+            "molecules and their properties."
+        ),
+        type=Path,
+    )
+    parser.add_argument(
+        "output_database", help="The output atomlite database.", type=Path
+    )
     return parser.parse_args()
 
 
