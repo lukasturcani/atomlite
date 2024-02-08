@@ -8,6 +8,10 @@ Json: typing.TypeAlias = (
 Conformer: typing.TypeAlias = list[list[float]]
 
 
+class SerializationError(Exception):
+    """An error occurred during serialization."""
+
+
 class Bonds(typing.TypedDict):
     """JSON representation of bonds."""
 
@@ -54,6 +58,9 @@ def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
 
     Returns:
         A JSON molecule.
+
+    Raises:
+        SerializationError: If conversion from :mod:`rdkit` to JSON fails.
     """
     atomic_numbers = []
     atom_charges = []
@@ -100,7 +107,7 @@ def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
                 aromatic_bonds["atom2"].append(bond.GetEndAtomIdx())
             case _:
                 msg = f"unsupported bond type: {bond.GetBondType()}"
-                raise RuntimeError(msg)
+                raise SerializationError(msg)
 
     d: Molecule = {
         "atomic_numbers": atomic_numbers,

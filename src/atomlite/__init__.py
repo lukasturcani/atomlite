@@ -10,6 +10,7 @@ from atomlite._internal.json import (
     Bonds,
     Json,
     Molecule,
+    SerializationError,
     json_from_rdkit,
     json_to_rdkit,
 )
@@ -28,4 +29,5 @@ __all__ = [
     "Molecule",
     "json_to_rdkit",
     "json_from_rdkit",
+    "SerializationError",
 ]
