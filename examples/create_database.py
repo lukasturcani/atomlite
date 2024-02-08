@@ -19,8 +19,8 @@ import rdkit.Chem as rdkit  # noqa: N813
 def main() -> None:
     """Do the thing."""
     args = _parse_args()
-    database = atomlite.Database(args.output)
-    database.add_entries(_get_entries(args.input))
+    database = atomlite.Database(args.output_database)
+    database.add_entries(_get_entries(args.input_sdf))
 
 
 def _parse_args() -> argparse.Namespace:
