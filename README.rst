@@ -34,8 +34,8 @@ AtomLite:
   # Create a database.
   db = atomlite.Database("molecules.db")
   # Create database entries.
-  entry1 = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"), {"prop1": "Hi"})
-  entry2 = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("CN"), {"prop2": 203})
+  entry1 = atomlite.Entry.from_rdkit("first", rdkit.MolFromSmiles("C"), {"prop1": "hi", "prop2": 100})
+  entry2 = atomlite.Entry.from_rdkit("second", rdkit.MolFromSmiles("CN"), {"prop1": "thing", "prop2": 203})
   # Add entries to database.
   db.add_entries([entry1, entry2])
   # Retrieve entries from database.
@@ -43,5 +43,25 @@ AtomLite:
     molecule = atomlite.json_to_rdkit(entry.molecule)
     print(entry.properties)
 
+::
+
+  {'prop1': 'hi', 'prop2': 100}
+  {'prop1': 'thing', 'prop2': 203}
+
+.. code-block:: python
+
+  db.get_property_df(["$.prop1", "$.prop2"])
+
+::
+
+  shape: (2, 3)
+  ┌────────┬─────────┬─────────┐
+  │ key    ┆ $.prop1 ┆ $.prop2 │
+  │ ---    ┆ ---     ┆ ---     │
+  │ str    ┆ str     ┆ i64     │
+  ╞════════╪═════════╪═════════╡
+  │ first  ┆ hi      ┆ 100     │
+  │ second ┆ thing   ┆ 203     │
+  └────────┴─────────┴─────────┘
 
 .. _docs: https://atomlite.readthedocs.io
