@@ -45,11 +45,11 @@ AtomLite:
 
 ::
 
-  {'prop1': 'Hi'}
-  {'prop2': 203}
+  {'prop1': 'hi', 'prop2': 100}
+  {'prop1': 'thing', 'prop2': 203}
 
 .. code-block:: python
 
-  db.get_property_df(["prop1", "prop2"])
+  db.get_property_df(["$.prop1", "$.prop2"])
 
 .. _docs: https://atomlite.readthedocs.io
