@@ -3,8 +3,10 @@ import json
 import pathlib
 import sqlite3
 import typing
+from collections import defaultdict
 from dataclasses import dataclass, field
 
+import polars as pl
 import rdkit.Chem as rdkit  # noqa: N813
 
 from atomlite._internal.json import Json, Molecule, json_from_rdkit
@@ -297,6 +299,63 @@ class Database:
             ).fetchone()[0]
             == 1
         )
+
+    def get_property_df(
+        self,
+        properties: collections.abc.Sequence[str],
+        *,
+        allow_missing: bool = False,
+    ) -> pl.DataFrame:
+        """Get a DataFrame of the properties in the database.
+
+        Parameters:
+            properties:
+                The paths of the properties to retrieve.
+                Valid paths are described
+                `here <https://www.sqlite.org/json1.html#path_arguments>`_.
+                You can also view various code
+                :ref:`examples<examples-valid-property-paths>`
+                in our docs.
+            allow_missing:
+                If ``True``, rows with some missing properties will be
+                included in the DataFrame and hold ``null`` values.
+
+        Returns:
+            A DataFrame of the property entries in the database.
+        """
+        columns = []
+        params = []
+        wheres = []
+        for i, prop in enumerate(properties):
+            columns.append(
+                f"json_extract(properties,?) AS prop{i},"
+                f"json_type(properties,?) AS type{i}"
+            )
+            params.append(prop)
+            params.append(prop)
+            wheres.append(f"prop{i} IS NOT NULL")
+
+        select = ",".join(columns)
+        where = " OR ".join(wheres) if allow_missing else " AND ".join(wheres)
+
+        data = defaultdict(list)
+        for key, *property_results in self.connection.execute(
+            f"SELECT key,{select} "  # noqa: S608
+            f"FROM {self._molecule_table} "
+            f"WHERE {where}",
+            params,
+        ):
+            data["key"].append(key)
+            for prop_name, prop_value, prop_type in _iter_props(
+                properties, property_results
+            ):
+                if prop_type in {"object", "array"}:
+                    data[prop_name].append(json.loads(prop_value))
+                elif prop_type in {"true", "false"}:
+                    data[prop_name].append(bool(prop_value))
+                else:
+                    data[prop_name].append(prop_value)
+        return pl.DataFrame(data)
 
     def get_entry(self, key: str) -> Entry | None:
         """Get a molecular entry from the database.
@@ -874,3 +933,11 @@ class Database:
             )
         if commit:
             self.connection.commit()
+
+
+def _iter_props(
+    prop_names: collections.abc.Sequence[str],
+    props: collections.abc.Sequence[typing.Any],
+) -> collections.abc.Iterator[tuple[str, typing.Any, str]]:
+    for name, i in zip(prop_names, range(0, len(props), 2), strict=True):
+        yield name, props[i], props[i + 1]

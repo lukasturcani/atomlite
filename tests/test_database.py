@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 import atomlite
 import numpy as np
+import polars as pl
+import polars.testing as pl_testing
 import pytest
 import rdkit.Chem.AllChem as rdkit  # noqa: N813
 
@@ -499,6 +501,142 @@ def _assert_conformers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
         assert np.all(
             np.equal(conformer1.GetPositions(), conformer2.GetPositions()),
         )
+
+
+def test_get_property_df_and() -> None:
+    db = atomlite.Database(":memory:")
+    db.add_entries(
+        [
+            atomlite.Entry.from_rdkit(
+                "first",
+                rdkit.MolFromSmiles("C"),
+                {"a": 1, "b": 10.0},
+            ),
+            atomlite.Entry.from_rdkit(
+                "second",
+                rdkit.MolFromSmiles("CC"),
+                {"a": 2, "b": 20.0, "c": "hi second"},
+            ),
+            atomlite.Entry.from_rdkit(
+                "third",
+                rdkit.MolFromSmiles("CCC"),
+                {"a": 3, "b": 30.0, "c": "hi third", "d": [1, 2, 3]},
+            ),
+            atomlite.Entry.from_rdkit(
+                "fourth",
+                rdkit.MolFromSmiles("CCCC"),
+                {"a": 4, "b": 40.0, "e": {"a": 12, "b": 24}},
+            ),
+            atomlite.Entry.from_rdkit(
+                "five",
+                rdkit.MolFromSmiles("CCCC"),
+                {"a": 4, "b": 40.0, "f": True},
+            ),
+            atomlite.Entry.from_rdkit(
+                "six",
+                rdkit.MolFromSmiles("CCCC"),
+                {"a": 4, "b": 40.0, "f": False},
+            ),
+        ]
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b"]),
+        pl.DataFrame(
+            {
+                "key": ["first", "second", "third", "fourth", "five", "six"],
+                "$.a": [1, 2, 3, 4, 4, 4],
+                "$.b": [10.0, 20.0, 30.0, 40.0, 40.0, 40.0],
+            }
+        ),
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b", "$.c"]),
+        pl.DataFrame(
+            {
+                "key": ["second", "third"],
+                "$.a": [2, 3],
+                "$.b": [20.0, 30.0],
+                "$.c": ["hi second", "hi third"],
+            }
+        ),
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b", "$.e"]),
+        pl.DataFrame(
+            {
+                "key": ["fourth"],
+                "$.a": [4],
+                "$.b": [40.0],
+                "$.e": [{"a": 12, "b": 24}],
+            }
+        ),
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b", "$.d"]),
+        pl.DataFrame(
+            {
+                "key": ["third"],
+                "$.a": [3],
+                "$.b": [30.0],
+                "$.d": [[1, 2, 3]],
+            }
+        ),
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b", "$.f"]),
+        pl.DataFrame(
+            {
+                "key": ["five", "six"],
+                "$.a": [4, 4],
+                "$.b": [40.0, 40.0],
+                "$.f": [True, False],
+            }
+        ),
+    )
+
+
+def test_get_property_df_or() -> None:
+    db = atomlite.Database(":memory:")
+    db.add_entries(
+        [
+            atomlite.Entry.from_rdkit(
+                "first",
+                rdkit.MolFromSmiles("C"),
+                {"a": 1, "b": 10.0},
+            ),
+            atomlite.Entry.from_rdkit(
+                "second",
+                rdkit.MolFromSmiles("CC"),
+                {"a": 2, "b": 20.0, "c": "hi second"},
+            ),
+            atomlite.Entry.from_rdkit(
+                "third",
+                rdkit.MolFromSmiles("CCC"),
+                {"a": 3, "b": 30.0, "c": "hi third"},
+            ),
+        ]
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b"], allow_missing=True),
+        pl.DataFrame(
+            {
+                "key": ["first", "second", "third"],
+                "$.a": [1, 2, 3],
+                "$.b": [10.0, 20.0, 30.0],
+            }
+        ),
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b", "$.c"], allow_missing=True),
+        pl.DataFrame(
+            {
+                "key": ["first", "second", "third"],
+                "$.a": [1, 2, 3],
+                "$.b": [10.0, 20.0, 30.0],
+                "$.c": [None, "hi second", "hi third"],
+            }
+        ),
+    )
 
 
 def _assert_atom_numbers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:

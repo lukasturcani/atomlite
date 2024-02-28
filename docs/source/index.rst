@@ -162,6 +162,53 @@ And retrieve them:
   * :meth:`.Database.get_entries`: For additional documentation.
   * :meth:`.Entry.from_rdkit`: For additional documentation.
 
+Retrieving molecular properties as a DataFrame
+..............................................
+
+.. testsetup:: retrieving_properties
+
+  import atomlite
+  db = atomlite.Database(":memory:")
+  import rdkit.Chem as rdkit
+
+We can retrieve the properties of molecules as a DataFrame:
+
+.. testcode:: retrieving_properties
+
+  db.add_entries(
+      [
+          atomlite.Entry.from_rdkit(
+              key="first",
+              molecule=rdkit.MolFromSmiles("C"),
+              properties={"num_atoms": 1, "is_interesting": False},
+          ),
+          atomlite.Entry.from_rdkit(
+              key="second",
+              molecule=rdkit.MolFromSmiles("CN"),
+              properties={"num_atoms": 2, "is_interesting": True},
+          ),
+      ]
+  )
+  print(db.get_property_df(["$.num_atoms", "$.is_interesting"]))
+
+.. testoutput:: retrieving_properties
+
+  shape: (2, 3)
+  ┌────────┬─────────────┬──────────────────┐
+  │ key    ┆ $.num_atoms ┆ $.is_interesting │
+  │ ---    ┆ ---         ┆ ---              │
+  │ str    ┆ i64         ┆ bool             │
+  ╞════════╪═════════════╪══════════════════╡
+  │ first  ┆ 1           ┆ false            │
+  │ second ┆ 2           ┆ true             │
+  └────────┴─────────────┴──────────────────┘
+
+.. seealso::
+
+  * :meth:`.Database.get_property_df`: For additional documentation.
+  * `Valid property paths`_: For a description of the syntax used to
+    retrieve properties.
+
 Updating molecular properties
 .............................
 
