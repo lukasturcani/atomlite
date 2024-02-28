@@ -52,4 +52,16 @@ AtomLite:
 
   db.get_property_df(["$.prop1", "$.prop2"])
 
+::
+
+  shape: (2, 3)
+  ┌────────┬─────────┬─────────┐
+  │ key    ┆ $.prop1 ┆ $.prop2 │
+  │ ---    ┆ ---     ┆ ---     │
+  │ str    ┆ str     ┆ i64     │
+  ╞════════╪═════════╪═════════╡
+  │ first  ┆ hi      ┆ 100     │
+  │ second ┆ thing   ┆ 203     │
+  └────────┴─────────┴─────────┘
+
 .. _docs: https://atomlite.readthedocs.io
