@@ -301,7 +301,10 @@ class Database:
         )
 
     def get_property_df(
-        self, properties: collections.abc.Sequence[str]
+        self,
+        properties: collections.abc.Sequence[str],
+        *,
+        allow_missing: bool = False,
     ) -> pl.DataFrame:
         """Get a DataFrame of the properties in the database.
 
@@ -313,6 +316,9 @@ class Database:
                 You can also view various code
                 :ref:`examples<examples-valid-property-paths>`
                 in our docs.
+            allow_missing:
+                If ``True``, missing properties will be
+                represented as ``null`` in the DataFrame.
 
         Returns:
             A DataFrame of the property entries in the database.
@@ -330,7 +336,7 @@ class Database:
             wheres.append(f"prop{i} IS NOT NULL")
 
         select = ",".join(columns)
-        where = " AND ".join(wheres)
+        where = " OR ".join(wheres) if allow_missing else " AND ".join(wheres)
 
         data = defaultdict(list)
         for key, *property_results in self.connection.execute(

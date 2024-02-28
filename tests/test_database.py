@@ -503,7 +503,7 @@ def _assert_conformers_match(expected: rdkit.Mol, actual: rdkit.Mol) -> None:
         )
 
 
-def test_get_property_df() -> None:
+def test_get_property_df_and() -> None:
     db = atomlite.Database(":memory:")
     db.add_entries(
         [
@@ -590,6 +590,50 @@ def test_get_property_df() -> None:
                 "$.a": [4, 4],
                 "$.b": [40.0, 40.0],
                 "$.f": [True, False],
+            }
+        ),
+    )
+
+
+def test_get_property_df_or() -> None:
+    db = atomlite.Database(":memory:")
+    db.add_entries(
+        [
+            atomlite.Entry.from_rdkit(
+                "first",
+                rdkit.MolFromSmiles("C"),
+                {"a": 1, "b": 10.0},
+            ),
+            atomlite.Entry.from_rdkit(
+                "second",
+                rdkit.MolFromSmiles("CC"),
+                {"a": 2, "b": 20.0, "c": "hi second"},
+            ),
+            atomlite.Entry.from_rdkit(
+                "third",
+                rdkit.MolFromSmiles("CCC"),
+                {"a": 3, "b": 30.0, "c": "hi third"},
+            ),
+        ]
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b"], allow_missing=True),
+        pl.DataFrame(
+            {
+                "key": ["first", "second", "third"],
+                "$.a": [1, 2, 3],
+                "$.b": [10.0, 20.0, 30.0],
+            }
+        ),
+    )
+    pl_testing.assert_frame_equal(
+        db.get_property_df(["$.a", "$.b", "$.c"], allow_missing=True),
+        pl.DataFrame(
+            {
+                "key": ["first", "second", "third"],
+                "$.a": [1, 2, 3],
+                "$.b": [10.0, 20.0, 30.0],
+                "$.c": [None, "hi second", "hi third"],
             }
         ),
     )
