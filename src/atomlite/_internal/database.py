@@ -317,8 +317,8 @@ class Database:
                 :ref:`examples<examples-valid-property-paths>`
                 in our docs.
             allow_missing:
-                If ``True``, missing properties will be
-                represented as ``null`` in the DataFrame.
+                If ``True``, rows with some missing properties will be
+                included in the DataFrame and hold ``null`` values.
 
         Returns:
             A DataFrame of the property entries in the database.
