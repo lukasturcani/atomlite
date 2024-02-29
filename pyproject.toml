@@ -9,6 +9,7 @@ maintainers = [
 ]
 
 dependencies = [
+  "polars",
   "rdkit",
 ]
 requires-python = ">=3.11"
@@ -21,7 +22,6 @@ dev = [
   "ruff",
   "mypy",
   "numpy",
-  "polars",
   "pytest",
   "pytest-cov",
   "sphinx",
