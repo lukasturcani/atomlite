@@ -18,6 +18,9 @@ Welcome to atomlite's documentation!
   json_to_rdkit <_autosummary/atomlite.json_to_rdkit>
   Modules <modules>
 
+.. tip::
+
+  ⭐ Star us on GitHub! ⭐
 
 GitHub: https://github.com/lukasturcani/atomlite
 
