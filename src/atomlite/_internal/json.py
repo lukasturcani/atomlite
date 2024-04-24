@@ -8,6 +8,15 @@ Json: typing.TypeAlias = (
 Conformer: typing.TypeAlias = list[list[float]]
 
 
+class AtomCharges(typing.TypedDict):
+    """JSON representation of atom charges."""
+
+    atom: list[int]
+    """The sorted indices of atoms in the molecule."""
+    charge: list[int]
+    """The charges of atoms in the molecule."""
+
+
 class Bonds(typing.TypedDict):
     """JSON representation of bonds."""
 
@@ -33,7 +42,7 @@ class Molecule(typing.TypedDict):
 
     atomic_numbers: list[int]
     """Atomic numbers of atoms in the molecule."""
-    atom_charges: typing.NotRequired[list[int]]
+    atom_charges: typing.NotRequired[AtomCharges]
     """Charges of atoms in the molecule."""
     bonds: typing.NotRequired[Bonds]
     """Bonds of the molecule."""
@@ -56,13 +65,13 @@ def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
         A JSON molecule.
     """
     atomic_numbers = []
-    atom_charges = []
-    save_charges = False
+    atom_charges_atom = []
+    atom_charges_charge = []
     for atom in molecule.GetAtoms():
         atomic_numbers.append(atom.GetAtomicNum())
-        atom_charges.append(atom.GetFormalCharge())
         if atom.GetFormalCharge() != 0:
-            save_charges = True
+            atom_charges_atom.append(atom.GetIdx())
+            atom_charges_charge.append(atom.GetFormalCharge())
 
     bonds: Bonds = {
         "atom1": [],
@@ -105,8 +114,11 @@ def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
     d: Molecule = {
         "atomic_numbers": atomic_numbers,
     }
-    if save_charges:
-        d["atom_charges"] = atom_charges
+    if atom_charges_atom:
+        d["atom_charges"] = {
+            "atom": atom_charges_atom,
+            "charge": atom_charges_charge,
+        }
     if bonds["atom1"]:
         d["bonds"] = bonds
     if dative_bonds["atom1"]:
@@ -162,12 +174,14 @@ def json_to_rdkit(molecule: Molecule) -> rdkit.Mol:  # noqa: C901
 
     mol = mol.GetMol()
 
-    for atom, charge in zip(
-        mol.GetAtoms(),
-        molecule.get("atom_charges", []),
-        strict=False,
-    ):
-        atom.SetFormalCharge(charge)
+    if "atom_charges" in molecule:
+        for idx, charge in zip(
+            molecule["atom_charges"]["atom"],
+            molecule["atom_charges"]["charge"],
+            strict=True,
+        ):
+            atom = mol.GetAtomWithIdx(idx)
+            atom.SetFormalCharge(charge)
 
     if "conformers" in molecule:
         num_atoms = len(molecule["atomic_numbers"])
