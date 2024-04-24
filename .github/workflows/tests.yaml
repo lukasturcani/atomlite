@@ -67,7 +67,7 @@ jobs:
       - run: pip install -e '.[dev]'
       - run: |
           python examples/from_sdf.py data/molecules.sdf test-atomlite.db
-          test -f data/test-atomlitex.db
+          test -f test-atomlite.db
   read-database-example:
     runs-on: ubuntu-22.04
     steps:
