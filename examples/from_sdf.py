@@ -1,4 +1,4 @@
-"""Write the ChEMBL database to an AtomLite file."""  # noqa: INP001
+"""Write a database from an SDF file."""  # noqa: INP001
 
 import argparse
 from pathlib import Path
@@ -10,9 +10,9 @@ import rdkit.Chem as rdkit  # noqa: N813
 def main() -> None:
     """Run the example."""
     args = _parse_args()
-    chembl = rdkit.SDMolSupplier(args.chembl)
+    sdf = rdkit.SDMolSupplier(args.sdf)
     db = atomlite.Database(args.output)
-    for i, mol in enumerate(chembl):
+    for i, mol in enumerate(sdf):
         db.add_entries(
             atomlite.Entry.from_rdkit(
                 key=str(i),
@@ -27,8 +27,8 @@ def main() -> None:
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "chembl",
-        help="Path to the ChEMBL sdf database file.",
+        "sdf",
+        help="Path to the sdf file.",
         type=Path,
     )
     parser.add_argument(
