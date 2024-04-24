@@ -56,7 +56,7 @@ jobs:
           cache: "pip"
       - run: pip install -e '.[dev]'
       - run: make -C docs doctest
-  write-chembl-example:
+  from-sdf-example:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
