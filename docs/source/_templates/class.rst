@@ -5,6 +5,17 @@
 .. autoclass:: {{ objname }}
    :members:
 
+   {% block attributes %}
+   {% if attributes %}
+   .. rubric:: {{ _('Attributes') }}
+
+   .. autosummary::
+   {% for item in attributes %}
+      ~{{ name }}.{{ item }}
+   {%- endfor %}
+   {% endif %}
+   {% endblock %}
+
    {% block methods %}
    {% if methods %}
    .. rubric:: {{ _('Methods') }}
@@ -15,17 +26,6 @@
       {%- if not item.startswith('_') and item not in inherited_members %}
       ~{{ name }}.{{ item }}
       {%- endif -%}
-   {%- endfor %}
-   {% endif %}
-   {% endblock %}
-
-   {% block attributes %}
-   {% if attributes %}
-   .. rubric:: {{ _('Attributes') }}
-
-   .. autosummary::
-   {% for item in attributes %}
-      ~{{ name }}.{{ item }}
    {%- endfor %}
    {% endif %}
    {% endblock %}
