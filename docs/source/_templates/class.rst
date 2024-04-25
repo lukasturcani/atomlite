@@ -20,7 +20,7 @@
 
    {% set direct_methods = [] %}
    {% for item in methods %}
-      {%- if item not in inherited_members %}
+      {%- if not item.startswith('_') and item not in inherited_members %}
         {% set direct_methods = direct_methods.append(item) %}
       {%- endif -%}
    {% endfor %}
