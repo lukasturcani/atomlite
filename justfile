@@ -5,12 +5,12 @@ default:
 # Build docs.
 docs:
   rm -rf docs/source/_autosummary
-  make -C docs html
+  uv run make -C docs html
   echo Docs are in $PWD/docs/build/html/index.html
 
 # Do a dev install.
-dev:
-  pip install -e '.[dev]'
+setup:
+  uv sync --all-extras --dev
 
 # Run code checks.
 check:
@@ -20,27 +20,27 @@ check:
   trap error=1 ERR
 
   echo
-  (set -x; ruff check . )
+  (set -x; uv run ruff check . )
 
   echo
-  ( set -x; ruff format --check . )
+  ( set -x; uv run ruff format --check . )
 
   echo
-  ( set -x; mypy . )
+  ( set -x; uv run mypy . )
 
   echo
-  ( set -x; pytest --cov=src --cov-report term-missing )
+  ( set -x; uv run pytest --cov=src --cov-report term-missing )
 
   echo
-  ( set -x; make -C docs doctest )
+  ( set -x; uv run make -C docs doctest )
 
   test $error = 0
 
 # Auto-fix code issues.
 fix:
-  ruff format .
-  ruff check --fix .
+  uv run ruff format .
+  uv run ruff check --fix .
 
 # Build a release.
 build:
-  python -m build
+  uv build
