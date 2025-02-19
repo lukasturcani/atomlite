@@ -10,14 +10,10 @@ jobs:
       VERSION: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: astral-sh/setup-uv@v3
         with:
-          python-version: "3.11"
-          cache: "pip"
-      - run: pip install -e '.[dev]'
-      - run: python -m build
-      - run:
-          twine upload
-          -u __token__
-          -p ${{ secrets.PYPI_API_TOKEN }}
-          dist/*
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+      - run: uv publish
