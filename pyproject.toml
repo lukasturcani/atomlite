@@ -76,7 +76,7 @@ disallow_any_generics = true
 
 [[tool.mypy.overrides]]
 module = [
-  "rdkit.*"
+  "rdkit.*",
 ]
 ignore_missing_imports = true
 disable_error_code = ["attr-defined"]
