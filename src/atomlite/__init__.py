@@ -19,13 +19,13 @@ Json = Json  # noqa: PLW0127 - allow self assignment so docs work
 
 
 __all__ = [
-    "Bonds",
     "AromaticBonds",
+    "Bonds",
     "Database",
     "Entry",
-    "PropertyEntry",
     "Json",
     "Molecule",
-    "json_to_rdkit",
+    "PropertyEntry",
     "json_from_rdkit",
+    "json_to_rdkit",
 ]
