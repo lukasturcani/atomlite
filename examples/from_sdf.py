@@ -3,8 +3,9 @@
 import argparse
 from pathlib import Path
 
-import atomlite
 import rdkit.Chem as rdkit  # noqa: N813
+
+import atomlite
 
 
 def main() -> None:
