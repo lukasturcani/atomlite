@@ -45,7 +45,7 @@ class Molecule(typing.TypedDict):
     """Conformers of the molecule."""
 
 
-def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:
+def json_from_rdkit(molecule: rdkit.Mol) -> Molecule:  # noqa: C901
     """Create a JSON representation of an :mod:`rdkit` molecule.
 
     Parameters:

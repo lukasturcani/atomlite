@@ -10,7 +10,7 @@ maintainers = [
 
 dependencies = [
   "polars",
-  "rdkit",
+  "rdkit>=2024.9.6",
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]
@@ -42,7 +42,7 @@ line-length = 79
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["ANN101", "COM812", "ISC001"]
+ignore = ["COM812", "ISC001", "A005"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -75,7 +75,8 @@ warn_unreachable = true
 disallow_any_generics = true
 
 [[tool.mypy.overrides]]
-module = [
-  "rdkit.*"
-]
+module = "rdkit.*"
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report term-missing"

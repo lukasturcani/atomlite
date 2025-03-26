@@ -1,13 +1,15 @@
+# mypy: disable-error-code="attr-defined"
 import json
 from collections import defaultdict
 from dataclasses import dataclass
 
-import atomlite
 import numpy as np
 import polars as pl
 import polars.testing as pl_testing
 import pytest
 import rdkit.Chem.AllChem as rdkit  # noqa: N813
+
+import atomlite
 
 
 @dataclass(frozen=True, slots=True)
@@ -737,6 +739,6 @@ def multiple_entry_case(request: pytest.FixtureRequest) -> MultipleEntryCase:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def database() -> atomlite.Database:
     return atomlite.Database(":memory:")
