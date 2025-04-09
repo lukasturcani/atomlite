@@ -4,14 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "atomlite"
-maintainers = [
-  { name = "Lukas Turcani", email = "lukasturcani93@gmail.com" },
-]
+maintainers = [{ name = "Lukas Turcani", email = "lukasturcani93@gmail.com" }]
 
-dependencies = [
-  "polars",
-  "rdkit>=2024.9.6",
-]
+dependencies = ["polars", "rdkit>=2024.9.6"]
 requires-python = ">=3.11"
 dynamic = ["version"]
 readme = "README.rst"
@@ -19,21 +14,24 @@ description = "A SQLite chemical database."
 
 [project.optional-dependencies]
 dev = [
-  "ruff",
-  "mypy",
-  "numpy",
-  "pytest",
-  "pytest-cov",
-  "sphinx",
-  "sphinx-copybutton",
-  "build",
-  "twine",
-  "furo",
+    "ruff",
+    "mypy",
+    "numpy",
+    "pytest",
+    "pytest-cov",
+    "sphinx",
+    "sphinx-copybutton",
+    "build",
+    "twine",
+    "furo",
 ]
 
 [project.urls]
 github = "https://github.com/lukasturcani/atomlite"
 documentation = "https://atomlite.readthedocs.io"
+
+[project.scripts]
+atomlite = "atomlite._internal.scripts.atomlite:main"
 
 [tool.setuptools_scm]
 
@@ -49,16 +47,16 @@ convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
-  "D100",
-  "D101",
-  "D102",
-  "D103",
-  "D104",
-  "D105",
-  "D106",
-  "D107",
-  "S101",
-  "INP001",
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+    "S101",
+    "INP001",
 ]
 "docs/source/conf.py" = ["D100", "INP001"]
 
