@@ -11,6 +11,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s",
 )
+logger = logging.getLogger(__name__)
 
 
 def _parse_args() -> argparse.Namespace:
@@ -29,7 +30,7 @@ def _parse_args() -> argparse.Namespace:
     dump.add_argument(
         "dump_path",
         type=pathlib.Path,
-        help="path to mol file",
+        help="path to file",
     )
 
     return parser.parse_args()
@@ -38,12 +39,17 @@ def _parse_args() -> argparse.Namespace:
 def main() -> None:
     args = _parse_args()
     if args.command == "dump":
+        if args.dump_path.suffix not in (".mol",):
+            msg = "only .mol files are supported"
+            raise RuntimeError(msg)
+
         db = Database(args.database_path)
         rdkit.MolToMolFile(
             mol=json_to_rdkit(db.get_entry(args.entry_key).molecule),
             filename=args.dump_path,
             forceV3000=True,
         )
+        logger.info("dumped %s to %s", args.entry_key, args.dump_path)
 
 
 if __name__ == "__main__":
