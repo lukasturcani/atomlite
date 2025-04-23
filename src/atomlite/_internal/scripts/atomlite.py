@@ -44,8 +44,13 @@ def main() -> None:
             raise RuntimeError(msg)
 
         db = Database(args.database_path)
+        entry = db.get_entry(args.entry_key)
+        if entry is None:
+            msg = f"entry {args.entry_key} not found"
+            raise RuntimeError(msg)
+
         rdkit.MolToMolFile(
-            mol=json_to_rdkit(db.get_entry(args.entry_key).molecule),
+            mol=json_to_rdkit(entry.molecule),
             filename=args.dump_path,
             forceV3000=True,
         )
