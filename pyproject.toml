@@ -35,6 +35,9 @@ dev = [
 github = "https://github.com/lukasturcani/atomlite"
 documentation = "https://atomlite.readthedocs.io"
 
+[project.scripts]
+atomlite = "atomlite._internal.scripts.atomlite:main"
+
 [tool.setuptools_scm]
 
 [tool.ruff]
